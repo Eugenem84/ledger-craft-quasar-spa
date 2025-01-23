@@ -46,7 +46,7 @@
       <router-view />
     </q-page-container>
 
-    <q-footer elevated class="bg-primary text-white">
+    <q-footer v-if="!$route.meta.hideFooter" elevated class="bg-primary text-white">
       <q-separator color="yellow"/>
 
       <q-tabs
@@ -71,6 +71,7 @@
 
 <script setup>
 import { ref } from 'vue'
+
 // import EssentialLink from 'components/EssentialLink.vue'
 
 const tab = ref('/orders')

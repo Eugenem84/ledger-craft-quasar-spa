@@ -10,6 +10,11 @@ const routes = [
       { path: 'catalog', component: () => import('pages/CatalogPage.vue')}
     ]
   },
+  {
+    path: '/orders/:id',
+    component: () => import('pages/OrderDetailsPage.vue'),
+    meta: { hideFooter: true}
+  },
 
   // Always leave this as last one,
   // but you can also remove it
