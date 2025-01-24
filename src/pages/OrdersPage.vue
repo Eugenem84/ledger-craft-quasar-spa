@@ -14,7 +14,7 @@ const goToOrderDetails = (id) => {
 const getOrders = async () => {
   loading.value = true
   try {
-    const response = await axios.get(`http://localhost:8876/api/get_orders_by_user/${1}`)
+    const response = await axios.get(`http://192.168.3.10:8876/api/get_orders_by_user/${1}`)
     orders.value = response.data
     console.log(response.data)
   } catch (err) {
