@@ -9,4 +9,11 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-navigation href="about:*" />
+    <preference name="InsecureMixedContent" value="1" />
+    <platform name="android">
+        <edit-config file="AndroidManifest.xml" mode="merge" target="application" xmlns:android="http://schemas.android.com/apk/res/android">
+            <android:usesCleartextTraffic>true</android:usesCleartextTraffic>
+        </edit-config>
+        <resource-file src="res/xml/network_security_config.xml" target="platforms/android/app/src/main/res/xml/network_security_config.xml" />
+    </platform>
 </widget>

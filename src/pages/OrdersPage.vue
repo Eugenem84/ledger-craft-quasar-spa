@@ -1,7 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
-import axios from "axios";
+import { api } from 'boot/axios.js'
+import { useAuthStore} from "stores/auth-store.js";
+
+const authStore = useAuthStore()
 
 const router = useRouter()
 const loading = ref(false)
@@ -14,7 +17,8 @@ const goToOrderDetails = (id) => {
 const getOrders = async () => {
   loading.value = true
   try {
-    const response = await axios.get(`http://192.168.3.10:8876/api/get_orders_by_user/${1}`)
+    const response = await api.get(`/get_orders_by_user/${1}`)
+    authStore.setToken(response.data.access_token)
     orders.value = response.data
     console.log(response.data)
   } catch (err) {

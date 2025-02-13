@@ -72,7 +72,7 @@ export default defineConfig((/* ctx */) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#devserver
     devServer: {
-      // https: true,
+      https: false,
       open: true // opens browser window automatically
     },
 
@@ -93,7 +93,7 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: ['Notify', 'Dialog']
     },
 
     // animations: 'all', // --- includes all animations
@@ -152,6 +152,9 @@ export default defineConfig((/* ctx */) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
     cordova: {
+      preferences: {
+        'InsecureMixedContent': '1'
+      }
       // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
     },
 

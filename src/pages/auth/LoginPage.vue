@@ -4,28 +4,42 @@ import { ref } from 'vue'
 import { useAuthStore} from "stores/auth-store.js";
 import { api } from "boot/axios.js";
 import {useRouter} from "vue-router";
+import {useQuasar} from "quasar";
 
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 
 const router = useRouter()
+const $q = useQuasar()
 
 const authStore = useAuthStore()
 
 const login = async () => {
   loading.value = true
+
+  //showDialog('информация', `старт отправки`)
+
   try {
+    $q.notify({
+      type: 'positive',
+      //message: `trying send to URL: ${api.defaults.baseURL} `
+    })
     const response = await api.post('/login', {
       email: email.value,
       password: password.value
     })
     authStore.setToken(response.data.access_token)
-    console.log('успешный вход: ', response)
+    localStorage.setItem('authToken', response.data.access_token)
+    //console.log('успешный вход: ', response)
     router.push('/orders')
-    //console.log('проверка хранилища pinia: ', authStore.token)
-    //console.log('проверка хранилища localStorage: ', localStorage.getItem('authToken'))
+    console.log('проверка хранилища pinia: ', authStore.token)
+    console.log('проверка хранилища localStorage: ', localStorage.getItem('authToken'))
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка входа: ' + err.message
+    })
     console.error('ошибка входа: ', err.message)
   } finally {
     loading.value = false
