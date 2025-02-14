@@ -30,11 +30,8 @@ const login = async () => {
       password: password.value
     })
     authStore.setToken(response.data.access_token)
-    localStorage.setItem('authToken', response.data.access_token)
-    //console.log('успешный вход: ', response)
     router.push('/orders')
     console.log('проверка хранилища pinia: ', authStore.token)
-    console.log('проверка хранилища localStorage: ', localStorage.getItem('authToken'))
   } catch (err){
     $q.notify({
       type: 'negative',

@@ -31,7 +31,10 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     //Глобальный перехватчик маршрутов для защиты страниц
   Router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
-    if (to.meta.requiredAuth && !authStore.token) {
+    console.log('authStoreToken: ',authStore.token)
+    const token = authStore.token || localStorage.getItem('authToken');
+    if (to.meta.requiresAuth && !token) {
+      console.log('Redirecting to login');
       next('/login')
     } else {
       next()

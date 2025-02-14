@@ -8,13 +8,13 @@ const routes = [
       { path: 'analytic', component: () => import('pages/AnalyticPage.vue'), meta: { requiresAuth: true }},
       { path: 'other', component: () => import('pages/OtherPage.vue'), meta: { requiresAuth: true }},
       { path: 'catalog', component: () => import('pages/CatalogPage.vue'), meta: { requiresAuth: true }},
-      { path: 'login', component: () => import('pages/auth/LoginPage.vue'), meta: { hideFooter: true }}
+      { path: 'login', component: () => import('pages/auth/LoginPage.vue'), meta: { hideFooter: false }}
     ]
   },
   {
     path: '/orders/:id',
     component: () => import('pages/OrderDetailsPage.vue'),
-    meta: { hideFooter: true, requiredAuth: false}
+    meta: { hideFooter: true, requiredAuth: true}
   },
 
   // Always leave this as last one,
