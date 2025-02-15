@@ -8,7 +8,7 @@ const routes = [
       { path: 'analytic', component: () => import('pages/AnalyticPage.vue'), meta: { requiresAuth: true }},
       { path: 'other', component: () => import('pages/OtherPage.vue'), meta: { requiresAuth: true }},
       { path: 'catalog', component: () => import('pages/CatalogPage.vue'), meta: { requiresAuth: true }},
-      { path: 'login', component: () => import('pages/auth/LoginPage.vue'), meta: { hideFooter: false }}
+      { path: 'login', component: () => import('pages/auth/LoginPage.vue'), meta: { hideFooter: true }}
     ]
   },
   {

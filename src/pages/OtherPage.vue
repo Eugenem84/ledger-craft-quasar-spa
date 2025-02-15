@@ -1,10 +1,22 @@
 <script setup>
 import { useAuthStore } from 'stores/auth-store.js';
 import { useRouter } from 'vue-router';
+import {useSpecializationsStore} from "stores/specializations.js";
+import {computed,ref} from 'vue'
+//import specializations from "boot/specializations.js";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const specializationStore = useSpecializationsStore()
 
+const selectedSpecialization = ref(specializationStore.selectSpecialization)
+
+const specializations = computed(() => specializationStore.specializations)
+
+const changeSpecialization = () => {
+  specializationStore.setSelectedSpecialization(selectedSpecialization)
+  console.log('текущая специализация: ', specializationStore.selectedSpecialization)
+}
 // Функция выхода из системы
 const logout = () => {
   authStore.logout(); // Очистка токена в Pinia
@@ -15,6 +27,17 @@ const logout = () => {
 
 <template>
   <q-btn class="bg-primary" @click="logout">Logout</q-btn>
+
+  <div>
+    <q-select v-model="selectedSpecialization"
+              :options="specializations"
+              option-value="id"
+              option-label="specializationName"
+              label="Выберите специализацию"
+              @update:model-value="changeSpecialization">
+    </q-select>
+  </div>
+
 </template>
 
 <style scoped>

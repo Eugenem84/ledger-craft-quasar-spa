@@ -23,7 +23,7 @@ const login = async () => {
   try {
     $q.notify({
       type: 'positive',
-      //message: `trying send to URL: ${api.defaults.baseURL} `
+      message: `trying send URL: ${api.defaults.baseURL} `
     })
     const response = await api.post('/login', {
       email: email.value,
