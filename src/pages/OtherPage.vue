@@ -2,7 +2,7 @@
 import { useAuthStore } from 'stores/auth-store.js';
 import { useRouter } from 'vue-router';
 import {useSpecializationsStore} from "stores/specializations.js";
-import {computed,ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 //import specializations from "boot/specializations.js";
 
 const authStore = useAuthStore();
@@ -13,8 +13,12 @@ const selectedSpecialization = ref(specializationStore.selectSpecialization)
 
 const specializations = computed(() => specializationStore.specializations)
 
+onMounted(() => {
+  selectedSpecialization.value = specializationStore.selectedSpecialization
+})
+
 const changeSpecialization = () => {
-  specializationStore.setSelectedSpecialization(selectedSpecialization)
+  specializationStore.setSelectedSpecialization(selectedSpecialization.value)
   console.log('текущая специализация: ', specializationStore.selectedSpecialization)
 }
 // Функция выхода из системы

@@ -25,7 +25,7 @@ export const useSpecializationsStore = defineStore('specializations', {
       }
     },
     setSelectedSpecialization(specialization) {
-      this.selectedSpecialization = specialization.value.id;
+      this.selectedSpecialization = specialization;
       console.log('применяемм выбранную спеиализацию: ', specialization)
       console.log('Изменение специализации на: ', this.selectedSpecialization);
     }

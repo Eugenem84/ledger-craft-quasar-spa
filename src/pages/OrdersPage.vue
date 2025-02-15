@@ -37,7 +37,7 @@ const getOrders = async () => {
   loading.value = true
   try {
     const specializationsStore = useSpecializationsStore()
-    const id = specializationsStore.selectedSpecialization
+    const id = specializationsStore.selectedSpecialization.id
     console.log('запрашиваем ордеры специализации: ', id)
     const token = localStorage.getItem('authToken')
     console.log('token: ', token)
