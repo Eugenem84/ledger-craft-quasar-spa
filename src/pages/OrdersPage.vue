@@ -126,22 +126,15 @@ onMounted(() => {
 <style scoped>
 
 .border-waiting {
-  border: 1px solid yellow;
-  border-radius: 4px;
-  inset: 1px;
+  border-left: 3px solid yellow;
 }
 
 .border-done {
-  border: 1px solid green;
-  border-radius: 4px;
-  inset: 1px;
+  border-left: 3px solid green;
 }
 
 .border-process {
-  border: 1px solid red;
-  border-radius: 4px;
-  top: -1px;
-  bottom: 5px;
+  border-left: 3px solid red;
 }
 
 </style>
