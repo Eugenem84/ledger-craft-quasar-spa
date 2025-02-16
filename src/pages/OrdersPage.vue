@@ -12,6 +12,14 @@ const loading = ref(false)
 const orders = ref([])
 //const specializations = ref([])
 
+const statusBorderClass = (status) => {
+  return {
+    'border-waiting': status ==='waiting',
+    'border-done': status === 'done',
+    'border-process': status === 'process'
+  }
+}
+
 const goToOrderDetails = (id) => {
   console.log('переходим на ордер', id)
    router.push(`/orders/${id}`)
@@ -73,19 +81,34 @@ onMounted(() => {
               v-ripple
               @click="goToOrderDetails"
               class="flex-direction: column"
+              style="height: 20px"
+              :class="statusBorderClass(order.status)"
       >
         <!-- Первый ряд (3 колонки) -->
         <q-item-section class="col-12">
-          <div class="row no-wrap">
-            <div class="col-6 text-left">
-              <q-item-label class="text-body1">
+          <div class="row no-wrap items-center">
+            <div class="col-3 text-left">
+              <q-item-label class="text-body1 q-pa-none q-ma-none" style="font-size: 16px; align-items: flex-start; margin-bottom: -7px">
                 {{ new Date(order.created_at).toLocaleDateString('ru-RU') }}
               </q-item-label>
-            </div>
-            <div class="col-4 text-center">
-              <q-item-label>
-                №: {{ order.id }}
+              <q-item-label class="q-ml-sm" style="white-space: nowrap; color: gray">
+                №: {{order.id}}
               </q-item-label>
+            </div>
+            <div class="col-6 text-center">
+              <q-item-label>
+                 {{ order.client_name }}
+              </q-item-label>
+            </div>
+            <div class="col-1 text-right">
+              <div v-if="order.paid"
+                   class="q-ml-sm"
+                   style="display:flex; flex-direction: column" align="center">
+                <q-item-label>
+                  <q-icon name="verified" color="green" class="q-ml-sm" />
+                  <span class="text-caption text-green" style="font-size: 9px">оплачено</span>
+                </q-item-label>
+              </div>
             </div>
             <div class="col-2 text-right">
               <q-item-label class="text-body1">
@@ -95,17 +118,30 @@ onMounted(() => {
           </div>
         </q-item-section>
 
-        <!-- Второй ряд (имя клиента на всю ширину) -->
-        <q-item-section class="col-12 text-center text-gray-8 text-caption">
-          <q-item-label>
-            {{ order.client_name }}
-          </q-item-label>
-        </q-item-section>
       </q-item>
     </q-list>
   </q-page>
 </template>
 
 <style scoped>
+
+.border-waiting {
+  border: 1px solid yellow;
+  border-radius: 4px;
+  inset: 1px;
+}
+
+.border-done {
+  border: 1px solid green;
+  border-radius: 4px;
+  inset: 1px;
+}
+
+.border-process {
+  border: 1px solid red;
+  border-radius: 4px;
+  top: -1px;
+  bottom: 5px;
+}
 
 </style>
