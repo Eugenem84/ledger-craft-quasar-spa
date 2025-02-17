@@ -3,14 +3,12 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from "vue-router";
 import { api } from 'boot/axios.js'
 import {useSpecializationsStore} from "stores/specializations.js";
-//import { useAuthStore} from "stores/auth-store.js";
+import {useOrderStore} from "stores/order.js";
 
-//const authStore = useAuthStore()
-
+const orderStore = useOrderStore()
 const router = useRouter()
 const loading = ref(false)
 const orders = ref([])
-//const specializations = ref([])
 
 const statusBorderClass = (status) => {
   return {
@@ -22,7 +20,8 @@ const statusBorderClass = (status) => {
 
 const goToOrderDetails = (order) => {
   console.log('переходим на ордер', order.id)
-   router.push(`/orders/${order.id}`)
+  orderStore.setOrder(order)
+  router.push(`/orders/${order.id}`)
 }
 
 const getOrders = async () => {

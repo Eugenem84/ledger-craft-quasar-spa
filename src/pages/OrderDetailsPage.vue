@@ -1,16 +1,19 @@
 <script setup>
 import {ref, computed, onMounted} from 'vue'
-//import {route} from "quasar/wrappers";
-import { useRoute } from 'vue-router';
+import {useOrderStore} from "stores/order.js";
 
-const route = useRoute();
+const orderStore = useOrderStore()
 
-const orderId = route.params.id
 const orderStatus = ref('waiting');
 const paid = ref(false)
 
+const order = ref(null)
+
 onMounted(() => {
-  console.log('детали ордера: ', orderId)
+  order.value = orderStore.currentOrder
+  console.log('ордер: ', order.value)
+  paid.value = order.value.paid
+  orderStatus.value = order.value.status
 })
 
 const togglePaid = () => {
