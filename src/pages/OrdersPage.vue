@@ -20,26 +20,10 @@ const statusBorderClass = (status) => {
   }
 }
 
-const goToOrderDetails = (id) => {
-  console.log('переходим на ордер', id)
-   router.push(`/orders/${id}`)
+const goToOrderDetails = (order) => {
+  console.log('переходим на ордер', order.id)
+   router.push(`/orders/${order.id}`)
 }
-
-// const getSpecializations = async () => {
-//   try {
-//     const token = localStorage.getItem('authToken')
-//     const response = await api.get('/get_specializations_by_user', {
-//       headers: {
-//         Authorization: `Bearer ${token}`
-//       }
-//     })
-//     specializations.value = response.data
-//   } catch (err){
-//     console.error('Ошибка получения специализаций: ', err)
-//   } finally {
-//     console.log('Специализации: ', specializations.value)
-//   }
-// }
 
 const getOrders = async () => {
   loading.value = true
@@ -66,7 +50,6 @@ const getOrders = async () => {
 
 onMounted(() => {
   getOrders()
-  //getSpecializations()
 })
 
 </script>
@@ -76,10 +59,10 @@ onMounted(() => {
     <q-list bordered separator>
       <q-item-label v-if="orders.length === 0">Нет данных</q-item-label>
       <q-item v-for="order in orders"
-              :key="order.id"
+              :key="order"
               clickable
               v-ripple
-              @click="goToOrderDetails"
+              @click="goToOrderDetails(order)"
               class="flex-direction: column"
               style="height: 20px"
               :class="statusBorderClass(order.status)"

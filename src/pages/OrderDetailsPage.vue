@@ -1,8 +1,18 @@
 <script setup>
-import {ref, computed} from 'vue'
+import {ref, computed, onMounted} from 'vue'
+//import {route} from "quasar/wrappers";
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+
+const orderId = route.params.id
 const orderStatus = ref('waiting');
 const paid = ref(false)
+
+onMounted(() => {
+  console.log('детали ордера: ', orderId)
+})
+
 const togglePaid = () => {
   paid.value = !paid.value
 }
@@ -60,6 +70,7 @@ const computedToggleColor = computed(() => {
            label="РЕД"
     />
   </div>
+
 
 </template>
 
