@@ -22,21 +22,24 @@ const computedToggleColor = computed(() => {
 
 <template>
 
-  <div class="upper-buttons">
+  <div class="row justify-between items-center no-wrap">
     <q-btn flat color="yellow"
-           label="назад"
+           label="НАЗАД"
            @click="$router.back()"
+           size="sm"
+           class="btn-flex"
     />
 
     <q-btn-toggle
       v-model="orderStatus"
+      size="sm"
       outline
       glossy
       :toggle-color="computedToggleColor"
       color="grey"
      :options="[
-    { label: 'ожидание', value: 'waiting' },
-    { label: 'в работе', value: 'process' },
+    { label: 'ожид', value: 'waiting' },
+    { label: 'враб', value: 'process' },
     { label: 'готово', value: 'done' }
   ]"
     >
@@ -44,18 +47,19 @@ const computedToggleColor = computed(() => {
     </q-btn-toggle>
 
     <q-btn outline
+           size="sm"
            @click="togglePaid"
            :color="paid ? 'green' : 'grey'"
            glossy
-           :label="paid ? 'Оплачено' : 'Не оплачено'"
-           style="min-width: 135px; max-width: 135px;"
+           label="опл"
     />
 
-    <q-btn flat color="yellow" label="изменить" />
-
-    <div class="q-mt-md">Статус: {{ paid ? 'Оплачено' : 'Не оплачено' }}</div>
+    <q-btn flat
+           size="sm"
+           color="yellow"
+           label="РЕД"
+    />
   </div>
-
 
 </template>
 
