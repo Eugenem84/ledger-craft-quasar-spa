@@ -1,6 +1,8 @@
 <script setup>
 import {ref, computed, onMounted} from 'vue'
 import {useOrderStore} from "stores/order.js";
+import {api} from "boot/axios.js";
+import {useSpecializationsStore} from "stores/specializations.js";
 
 const orderStore = useOrderStore()
 
@@ -8,12 +10,41 @@ const orderStatus = ref('waiting');
 const paid = ref(false)
 
 const order = ref(null)
+const services = ref(null)
 const client = ref(null)
 const model = ref(null)
+
+const selectedServiceCategory = ref(null)
+
+const serviceCategories = ref(null)
 
 const tab = ref('all')
 
 const editMode = ref(false)
+
+const getServices = async () => {
+  try {
+    const orderId = order.value.id
+    const response = await api.get(`/get_services/${orderId}`)
+    services.value = response.data
+    console.log('services: ', services.value )
+  }  catch (err) {
+    console.error('ошибка загрузки сервисов', err)
+  }
+}
+
+const getServiceCategories = async () => {
+  const specializationStore = useSpecializationsStore()
+  try {
+    const specializationId = specializationStore.getSelectedSpecialization.id
+    console.log('специализация: ', specializationId)
+    const response = await api.get(`/get_categories/${specializationId}`)
+    serviceCategories.value = response.data
+    console.log('сервис категории: ', serviceCategories.value)
+  } catch (err) {
+    console.error('ошибка загрузки сервис категорий', err)
+  }
+}
 
 onMounted(() => {
   order.value = orderStore.currentOrder
@@ -24,6 +55,8 @@ onMounted(() => {
   if (order.value.model){
     model.value = order.value.model
   }
+  getServices()
+  getServiceCategories()
 })
 
 const activeEditMode = () => {
@@ -148,14 +181,49 @@ const computedToggleColor = computed(() => {
       <q-separator />
 
       <q-tab-panels v-model="tab" animated>
-        <q-tab-panel name="all">
+        <q-tab-panel name="all" style="padding: 0">
           <div>
-            весь заказ
+            <q-list bordered separator >
+
+              <q-item-label v-if="!services">Нет сервисов</q-item-label>
+              <q-item v-for="service in services"
+                      :key="service"
+                      class="w-100 justify-between"
+                      style="width: 100%"
+              >
+                <!-- сервисы -->
+                <q-item-section >
+                      <q-item-label class="text-left">
+                        {{ service.service }}
+                      </q-item-label>
+                </q-item-section>
+
+
+                <q-item-section >
+                      <q-item-label class="text-right">
+                        {{ service.price }}
+                      </q-item-label>
+                </q-item-section>
+
+              </q-item>
+            </q-list>
           </div>
         </q-tab-panel>
 
+
         <q-tab-panel name="servicesChoice">
-          <div>выбор работ</div>
+          <q-select v-model="selectedServiceCategory"
+                    :options="serviceCategories"
+                    option-label="category_name"
+                    option-value="id"
+                    label="категории работ"
+                    dense
+                    placeholder="нет категорий"
+
+          ></q-select>
+
+
+
         </q-tab-panel>
 
         <q-tab-panel name="materialsChoice">
