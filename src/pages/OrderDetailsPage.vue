@@ -17,6 +17,7 @@ const model = ref(null)
 const selectedServiceCategory = ref(null)
 
 const serviceCategories = ref(null)
+const servicesByCategory = ref(null)
 
 const tab = ref('all')
 
@@ -43,6 +44,17 @@ const getServiceCategories = async () => {
     console.log('сервис категории: ', serviceCategories.value)
   } catch (err) {
     console.error('ошибка загрузки сервис категорий', err)
+  }
+}
+
+const getServicesByCategory = async (categoryId) => {
+  console.log('подгружаем сервисы категории: ', categoryId)
+  try {
+    const response = await api.get(`/get_service/${categoryId}`)
+    servicesByCategory.value = response.data
+    console.log('подгружены сервисы категории: ', servicesByCategory.value)
+  } catch (err) {
+    console.error('ошибка загрузке сервисов данной категории: ', categoryId , err )
   }
 }
 
@@ -216,11 +228,12 @@ const computedToggleColor = computed(() => {
                     :options="serviceCategories"
                     option-label="category_name"
                     option-value="id"
+                    emit-value
                     label="категории работ"
                     dense
                     placeholder="нет категорий"
-
-          ></q-select>
+                    @update:model-value="getServicesByCategory"
+          />
 
 
 
