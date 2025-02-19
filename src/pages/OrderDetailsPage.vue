@@ -3,6 +3,7 @@ import {ref, computed, onMounted} from 'vue'
 import {useOrderStore} from "stores/order.js";
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
+//import {data} from "autoprefixer";
 
 const orderStore = useOrderStore()
 
@@ -35,7 +36,7 @@ const getServices = async () => {
   }
 }
 
-const swithPaidStatus = async () => {
+const switсhPaidStatus = async () => {
   const id = order.value.id
   try {
     const response = await api.put(`switch_paid_status/${id}`)
@@ -45,6 +46,21 @@ const swithPaidStatus = async () => {
     }
   } catch (err) {
     console.log('ошибка смены статуса: ', err)
+  }
+}
+
+const updateOrderStatus = async () => {
+  try {
+    const id = order.value.id
+    const response = await api.put(`/update_order_status/${id}`, {
+      status: orderStatus.value
+    })
+    if (response.status === 200) {
+      console.log('статус ордера изменен на: ', orderStatus.value)
+    } else {
+      console.error('ошибка обновления статуса', response)}
+  } catch (err) {
+    console.error('ошибка запроса: ', err)
   }
 }
 
@@ -166,7 +182,8 @@ const computedToggleColor = computed(() => {
       glossy
       :toggle-color="computedToggleColor"
       color="grey"
-     :options="[
+      @update:model-value="updateOrderStatus"
+      :options="[
     { label: 'ожид', value: 'waiting' },
     { label: 'враб', value: 'process' },
     { label: 'готово', value: 'done' }
@@ -177,7 +194,7 @@ const computedToggleColor = computed(() => {
 
     <q-btn outline
            size="sm"
-           @click="swithPaidStatus"
+           @click="switсhPaidStatus"
            :color="paid ? 'green' : 'grey'"
            glossy
            label="опл"
