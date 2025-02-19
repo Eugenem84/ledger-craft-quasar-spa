@@ -11,6 +11,7 @@ const paid = ref(false)
 
 const order = ref(null)
 const services = ref(null)
+const materials =ref(null)
 const client = ref(null)
 const model = ref(null)
 
@@ -31,6 +32,17 @@ const getServices = async () => {
     console.log('services: ', services.value )
   }  catch (err) {
     console.error('ошибка загрузки сервисов', err)
+  }
+}
+
+const geMaterialsByOrder = async () => {
+  try {
+    const orderId = order.value.id
+    const response = await api.get(`/get_materials_by_order/${orderId}`)
+    materials.value = response.data
+    console.log('materials:', materials.value)
+  } catch (err) {
+    console.error('ошибка получения материалов: ', err)
   }
 }
 
@@ -68,6 +80,7 @@ onMounted(() => {
     model.value = order.value.model
   }
   getServices()
+  geMaterialsByOrder()
   getServiceCategories()
 })
 
@@ -82,6 +95,26 @@ const saveOrder = () => {
 const togglePaid = () => {
   paid.value = !paid.value
 }
+
+// Вычисляемая сумма материалов
+const totalSumServices = computed(() => {
+  if (!services.value) return 0;
+  return services.value.reduce((sum, service) => {
+    const price = Number(service.price) || 0;
+    return sum + price
+  }, 0);
+})
+
+// Вычисляемая сумма материалов
+const totalSumMaterials = computed(() => {
+  if (!materials.value) return 0;
+  return materials.value.reduce((sum, material) => {
+    const price = Number(material.price) || 0;
+    const amount = Number(material.amount) || 0;
+    return sum + price * amount;
+  }, 0);
+})
+
 const computedToggleColor = computed(() => {
   switch (orderStatus.value) {
     case 'waiting':
@@ -185,7 +218,7 @@ const computedToggleColor = computed(() => {
         align="justify"
         narrow-indicator
       >
-        <q-tab name="all" label="работ: материалов:" />
+        <q-tab name="all" :label="'работ: ' + (services ? services.length : 0) +  ' материалов: ' + (materials ? materials.length : 0)" />
         <q-tab name="servicesChoice" v-if="editMode" label="работы" />
         <q-tab name="materialsChoice" v-if="editMode" label="материалы" />
       </q-tabs>
@@ -193,8 +226,11 @@ const computedToggleColor = computed(() => {
       <q-separator />
 
       <q-tab-panels v-model="tab" animated>
+
+        <!-- панель отображения выбранных сервисов и материалов -->
         <q-tab-panel name="all" style="padding: 0">
           <div>
+
             <q-list bordered separator >
 
               <q-item-label v-if="!services">Нет сервисов</q-item-label>
@@ -213,34 +249,137 @@ const computedToggleColor = computed(() => {
 
                 <q-item-section >
                       <q-item-label class="text-right">
-                        {{ service.price }}
+                        {{ service.price }}р
                       </q-item-label>
                 </q-item-section>
 
               </q-item>
             </q-list>
+
+            <div class="text-grey text-left" v-show="totalSumServices > 0 && totalSumMaterials > 0" >
+              всего по работе : {{totalSumServices}}р
+            </div>
+
+            <!-- отображение списка материалов -->
+            <q-list bordered separator >
+
+              <q-item-label v-if="!materials">Нет материалов</q-item-label>
+              <q-item v-for="material in materials"
+                      :key="material"
+                      class="w-100 justify-between row"
+                      style="width: 100%"
+              >
+
+                <q-item-section class="col-8">
+                  <q-item-label class="text-left">
+                    {{ material.name }}
+                  </q-item-label>
+                </q-item-section>
+
+
+                <q-item-section class="col-1">
+                  <q-item-label class="text-right">
+                    {{ material.price }}р
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section class="col-1">
+                  <q-item-label class="text-center">
+                    х{{material.amount}}
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section class="col-1">
+                  <q-item-label class="text-right">
+                    {{material.price * material.amount}}р
+                  </q-item-label>
+                </q-item-section>
+
+              </q-item>
+            </q-list>
+
+            <div class="text-grey text-left" v-show="totalSumMaterials > 0 && totalSumServices > 0">
+              всего по материалам: {{totalSumMaterials}}р
+            </div>
+
+            <div class="text-grey text-center display: flex" >
+              <div>
+                всего к оплате:
+              </div>
+
+              <div class="text-green">
+                {{totalSumMaterials + totalSumServices}}
+              </div>
+              р
+            </div>
+
           </div>
+
+
+
         </q-tab-panel>
 
-
-        <q-tab-panel name="servicesChoice">
+        <!-- панель выбора сервисов -->
+        <q-tab-panel name="servicesChoice" style="padding: 0">
           <q-select v-model="selectedServiceCategory"
                     :options="serviceCategories"
                     option-label="category_name"
                     option-value="id"
                     emit-value
+                    map-options
                     label="категории работ"
                     dense
                     placeholder="нет категорий"
+                    label-color="grey"
+                    color="yellow"
                     @update:model-value="getServicesByCategory"
           />
+
+          <q-list bordered separator >
+            <q-item-label v-if="!servicesByCategory">Нет сервисов</q-item-label>
+            <q-item v-for="service in servicesByCategory"
+                    :key="service"
+                    class="w-100 justify-between"
+                    style="width: 100%"
+            >
+
+              <q-item-section >
+                <q-item-label class="text-left">
+                  {{ service.service }}
+                </q-item-label>
+              </q-item-section>
+
+
+              <q-item-section >
+                <q-item-label class="text-right">
+                  {{ service.price }}
+                </q-item-label>
+              </q-item-section>
+
+            </q-item>
+          </q-list>
 
 
 
         </q-tab-panel>
 
-        <q-tab-panel name="materialsChoice">
-          <div>выбор материалов</div>
+        <!-- панель выбора материалов -->
+        <q-tab-panel name="materialsChoice" style="padding: 0">
+
+          <q-list bordered separator>
+            <q-item-label v-if="!materials"> нет материалов</q-item-label>
+            <q-item v-for="material in materials"
+                    :key="material"
+                    class="w-100 justify-between"
+            >
+              <q-item-section>
+                <q-input model-value="material.name">
+
+                </q-input>
+              </q-item-section>
+            </q-item>
+          </q-list>
+
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
