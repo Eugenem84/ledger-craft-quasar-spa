@@ -35,6 +35,19 @@ const getServices = async () => {
   }
 }
 
+const swithPaidStatus = async () => {
+  const id = order.value.id
+  try {
+    const response = await api.put(`switch_paid_status/${id}`)
+    if (response.status === 200) {
+      paid.value = !paid.value
+      console.log('статус оплаты изменен')
+    }
+  } catch (err) {
+    console.log('ошибка смены статуса: ', err)
+  }
+}
+
 const geMaterialsByOrder = async () => {
   try {
     const orderId = order.value.id
@@ -90,10 +103,6 @@ const activeEditMode = () => {
 
 const saveOrder = () => {
   editMode.value = false
-}
-
-const togglePaid = () => {
-  paid.value = !paid.value
 }
 
 // Вычисляемая сумма материалов
@@ -168,7 +177,7 @@ const computedToggleColor = computed(() => {
 
     <q-btn outline
            size="sm"
-           @click="togglePaid"
+           @click="swithPaidStatus"
            :color="paid ? 'green' : 'grey'"
            glossy
            label="опл"
