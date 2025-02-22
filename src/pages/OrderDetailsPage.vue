@@ -5,6 +5,9 @@ import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
 //import {data} from "autoprefixer";
 
+const specializationsStore = useSpecializationsStore()
+const selectedSpecializationId = specializationsStore.getSelectedSpecialization.id
+
 const orderStore = useOrderStore()
 
 const orderStatus = ref('waiting');
@@ -13,8 +16,9 @@ const paid = ref(false)
 const order = ref(null)
 const services = ref(null)
 const materials =ref(null)
-const client = ref(null)
-const model = ref(null)
+const clientName = ref(null)
+const clientId = ref(null)
+const modelId = ref(null)
 
 const selectedServiceCategory = ref(null)
 
@@ -104,9 +108,11 @@ onMounted(() => {
   console.log('ордер: ', order.value)
   paid.value = order.value.paid
   orderStatus.value = order.value.status
-  client.value = order.value.client_name
-  if (order.value.model){
-    model.value = order.value.model
+  clientName.value = order.value.client_name
+  clientId.value = order.value.client_id
+  modelId.value = order.value.model_id
+  if (order.value.model_id){
+    modelId.value = order.value.model_id
   }
   getServices()
   geMaterialsByOrder()
@@ -117,9 +123,33 @@ const activeEditMode = () => {
   editMode.value = true
 }
 
-const saveOrder = () => {
-  editMode.value = false
+const updateOrder = async () => {
+  console.log('обновляем ордер на сервере')
+  console.log('services: ', services.value)
+  try {
+    const totalAmount = 0
+    const response = await api.post('/update_order', {
+      id: order.value.id,
+      client_id: clientId.value,
+      model_id: modelId.value,
+      specialization_id: selectedSpecializationId,
+      user_order_number: '',
+      total_amount: totalAmount.value,
+      materials: materials.value,
+      products: '',
+      comments: '',
+      services: services.value.map(service => service.id),
+      paid: paid.value
+    })
+    console.log('данные для передачи: ', response)
+  } catch (err) {
+    console.error('ошибка обновления ордера', err)
+  }
 }
+
+// const saveOrder = () => {
+//   editMode.value = false
+// }
 
 // Вычисляемая сумма материалов
 const totalSumServices = computed(() => {
@@ -212,24 +242,24 @@ const computedToggleColor = computed(() => {
            size="sm"
            color="yellow"
            label="сохр"
-           @click="saveOrder"
+           @click="updateOrder"
     />
   </div>
 
   <div class="row q-col-gutter-md">
-    <q-select v-model="client"
-              :options="[client]"
+    <q-select v-model="clientName"
+              :options="[clientName]"
               label="клиент"
               dense
               disable class="col"
     />
 
-    <q-select v-model="model"
-              :options="[model]"
+    <q-select v-model="modelId"
+              :options="[modelId]"
               label="модель"
               disable class="col"
               dense
-              :display-value="model === null ? 'нет модели' : model" />
+              :display-value="modelId === null ? 'нет модели' : modelId" />
   </div>
 
   <div>
@@ -375,7 +405,6 @@ const computedToggleColor = computed(() => {
                 </q-item-label>
               </q-item-section>
 
-
               <q-item-section >
                 <q-item-label class="text-right">
                   {{ service.price }}
@@ -396,13 +425,27 @@ const computedToggleColor = computed(() => {
             <q-item-label v-if="!materials"> нет материалов</q-item-label>
             <q-item v-for="material in materials"
                     :key="material"
-                    class="w-100 justify-between"
+                    class="w-100 justify-between row"
             >
-              <q-item-section>
-                <q-input model-value="material.name">
 
-                </q-input>
+              <q-item-section class="col-8">
+                <q-input v-model="material.name" />
               </q-item-section>
+
+              <q-item-section class="col-1">
+                <q-input v-model="material.amount" />
+              </q-item-section>
+
+              <q-item-section class="col-1">
+                <div>
+                  x
+                </div>
+              </q-item-section>
+
+              <q-item-section class="col-1" disabled="disabled">
+                <q-input :model-value="material.price * material.amount" />
+              </q-item-section>
+
             </q-item>
           </q-list>
 
