@@ -208,7 +208,7 @@ const computedToggleColor = computed(() => {
            v-if="editMode"
            color="yellow"
            label="отмена"
-           @click="saveOrder"
+           @click="$router.back()"
            size="sm"
            class="btn-flex"
     />
