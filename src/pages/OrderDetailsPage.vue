@@ -4,7 +4,10 @@ import {useOrderStore} from "stores/order.js";
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
 import {useRouter} from "vue-router";
+//import {useQuasar} from "quasar";
 //import {data} from "autoprefixer";
+
+//const $q = useQuasar()
 
 const router = useRouter()
 const specializationsStore = useSpecializationsStore()
@@ -31,6 +34,21 @@ const servicesByCategory = ref(null)
 const tab = ref('all')
 
 const editMode = ref(false)
+
+// const openAddMaterialDialog = () => {
+//   $q.dialog({
+//     title: 'добавление материала',
+//     message: 'сообщение',
+//     cancel: true,
+//     persistent: false
+//   }).onOk(() => {
+//     console.log('добавление нового материала')
+//   }).onDismiss(() => {
+//     console.log('отмена')
+//   }).onCancel(() => {
+//     console.log('закрыт диалог')
+//   })
+// }
 
 const getServices = async () => {
   try {
@@ -190,6 +208,35 @@ const computedToggleColor = computed(() => {
       return 'yellow'
   }
 })
+
+
+const showDialog = ref(false)
+const newMaterial = ref({
+  name: '',
+  price: 0,
+  amount: 0
+})
+
+const closeDialog = () => {
+  showDialog.value = false
+}
+
+const addMaterial = () => {
+  if (
+    newMaterial.value.name.trim() !== '' &&
+    newMaterial.value.price > 0 &&
+    newMaterial.value.amount > 0
+  ) {
+    console.log('Добавление нового материала:', { ...newMaterial.value })
+    materials.value.push(newMaterial.value)
+    newMaterial.value = { name: '', price: 0, amount: 0 }
+    showDialog.value = false
+    console.log('materials: ', materials)
+  } else {
+    console.error('Введите корректные данные')
+  }
+}
+
 </script>
 
 <template>
@@ -442,7 +489,7 @@ const computedToggleColor = computed(() => {
                     class="w-100 justify-between row"
             >
 
-              <q-item-section class="col-8">
+              <q-item-section class="col-7">
                 <q-input v-model="material.name" />
               </q-item-section>
 
@@ -456,16 +503,42 @@ const computedToggleColor = computed(() => {
                 </div>
               </q-item-section>
 
+              <q-item-section class="col-1">
+                <q-input v-model="material.price" />
+              </q-item-section>
+
               <q-item-section class="col-1" disabled="disabled">
                 <q-input :model-value="material.price * material.amount" />
               </q-item-section>
 
             </q-item>
+
           </q-list>
+
+          <div class="justify-center">
+            <q-btn class="bg-primary" @click="showDialog = true" />
+          </div>
 
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
+  </div>
+
+  <div>
+    <q-dialog v-model="showDialog">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Добавление материала</div>
+          <q-input v-model="newMaterial.name" label="Название" dense outlined class="q-mb-md" />
+          <q-input v-model.number="newMaterial.price" label="Цена" type="number" dense outlined class="q-mb-md" />
+          <q-input v-model.number="newMaterial.amount" label="Количество" type="number" dense outlined />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Отмена" color="primary" @click="closeDialog" />
+          <q-btn flat label="Добавить" color="primary" @click="addMaterial" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 
 </template>
