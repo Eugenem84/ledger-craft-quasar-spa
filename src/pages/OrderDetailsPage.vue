@@ -19,6 +19,7 @@ const materials =ref(null)
 const clientName = ref(null)
 const clientId = ref(null)
 const modelId = ref(null)
+const comments = ref(null)
 
 const selectedServiceCategory = ref(null)
 
@@ -114,6 +115,9 @@ onMounted(() => {
   if (order.value.model_id){
     modelId.value = order.value.model_id
   }
+  if (order.value.comments) {
+    comments.value = order.value.comments
+  }
   getServices()
   geMaterialsByOrder()
   getServiceCategories()
@@ -125,19 +129,19 @@ const activeEditMode = () => {
 
 const updateOrder = async () => {
   console.log('обновляем ордер на сервере')
-  console.log('services: ', services.value)
   try {
-    const totalAmount = 0
+    const totalAmount = totalSumServices.value + totalSumMaterials.value
+    console.log('totalAmount: ', totalAmount)
     const response = await api.post('/update_order', {
       id: order.value.id,
       client_id: clientId.value,
       model_id: modelId.value,
       specialization_id: selectedSpecializationId,
       user_order_number: '',
-      total_amount: totalAmount.value,
+      total_amount: totalAmount,
       materials: materials.value,
       products: '',
-      comments: '',
+      comments: comments.value,
       services: services.value.map(service => service.id),
       paid: paid.value
     })
@@ -371,6 +375,14 @@ const computedToggleColor = computed(() => {
 
           </div>
 
+          <q-input type="textarea"
+                   v-model="comments"
+                   label="комментарии"
+                   autogrow
+                   placeholder="Коментариев нет"
+                   :disable="!editMode"
+          />
+
 
 
         </q-tab-panel>
@@ -413,8 +425,6 @@ const computedToggleColor = computed(() => {
 
             </q-item>
           </q-list>
-
-
 
         </q-tab-panel>
 
