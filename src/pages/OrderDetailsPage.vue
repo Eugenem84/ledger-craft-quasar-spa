@@ -3,8 +3,10 @@ import {ref, computed, onMounted} from 'vue'
 import {useOrderStore} from "stores/order.js";
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
+import {useRouter} from "vue-router";
 //import {data} from "autoprefixer";
 
+const router = useRouter()
 const specializationsStore = useSpecializationsStore()
 const selectedSpecializationId = specializationsStore.getSelectedSpecialization.id
 
@@ -146,6 +148,8 @@ const updateOrder = async () => {
       paid: paid.value
     })
     console.log('данные для передачи: ', response)
+    console.log('данные ордера обновлены')
+    router.back()
   } catch (err) {
     console.error('ошибка обновления ордера', err)
   }
