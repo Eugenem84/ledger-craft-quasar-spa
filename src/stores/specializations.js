@@ -20,6 +20,7 @@ export const useSpecializationsStore = defineStore('specializations', {
         });
         this.specializations = response.data;
         console.log('specializations: ', this.specializations);
+        this.selectedSpecialization = this.specializations[0]
       } catch (err) {
         console.error('Ошибка получения специализаций: ', err);
       }

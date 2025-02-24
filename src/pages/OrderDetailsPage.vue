@@ -219,6 +219,7 @@ const newMaterial = ref({
 
 const closeDialog = () => {
   showDialog.value = false
+  newMaterial.value = { name: '', price: 0, amount: 0 }
 }
 
 const addMaterial = () => {
@@ -484,8 +485,8 @@ const addMaterial = () => {
 
           <q-list bordered separator>
             <q-item-label v-if="!materials"> нет материалов</q-item-label>
-            <q-item v-for="material in materials"
-                    :key="material"
+            <q-item v-for="(material, index) in materials"
+                    :key="index"
                     class="w-100 justify-between row"
             >
 
@@ -493,31 +494,45 @@ const addMaterial = () => {
                 <q-input v-model="material.name" />
               </q-item-section>
 
+
               <q-item-section class="col-1">
-                <q-input v-model="material.amount" />
+                <q-input v-model="material.price" input-class="text-right"/>
               </q-item-section>
 
               <q-item-section class="col-1">
-                <div>
-                  x
-                </div>
+                <q-input v-model="material.amount" input-class="text-right" prefix="x" />
               </q-item-section>
 
-              <q-item-section class="col-1">
-                <q-input v-model="material.price" />
-              </q-item-section>
-
-              <q-item-section class="col-1" disabled="disabled">
+              <q-item-section class="col-1" disabled="disabled" input-class="text-right" >
                 <q-input :model-value="material.price * material.amount" />
+              </q-item-section>
+
+              <q-item-section class="col-auto">
+                <q-btn icon="delete_forever" @click="materials.splice(index, 1)" color="red" flat round />
               </q-item-section>
 
             </q-item>
 
           </q-list>
 
-          <div class="justify-center">
-            <q-btn class="bg-primary" @click="showDialog = true" />
-          </div>
+          <!-- Плавающая кнопка добавления нового материала -->
+          <q-btn
+            icon="add"
+            round
+            class="fab bg-yellow text-black"
+            @click="showDialog = true"
+            size="20px"
+          />
+
+          <q-btn
+            icon="storage"
+            round
+            class="bg-yellow text-black"
+            size="18"
+            @click="console.log('добавление со склада не реализовано')"
+            style="position: fixed; bottom: 100px; right: 16px; z-index: 1000"
+          />
+
 
         </q-tab-panel>
       </q-tab-panels>
@@ -525,17 +540,17 @@ const addMaterial = () => {
   </div>
 
   <div>
-    <q-dialog v-model="showDialog">
+    <q-dialog v-model="showDialog" persistent>
       <q-card>
         <q-card-section>
           <div class="text-h6">Добавление материала</div>
-          <q-input v-model="newMaterial.name" label="Название" dense outlined class="q-mb-md" />
-          <q-input v-model.number="newMaterial.price" label="Цена" type="number" dense outlined class="q-mb-md" />
-          <q-input v-model.number="newMaterial.amount" label="Количество" type="number" dense outlined />
+          <q-input v-model="newMaterial.name" label-color="yellow" color="yellow" label="Название" outlined class="q-mb-md" />
+          <q-input v-model.number="newMaterial.price" label="Цена" label-color="yellow" color="yellow" type="number" outlined class="q-mb-md" />
+          <q-input v-model.number="newMaterial.amount" label="Количество" label-color="yellow" color="yellow" type="number" outlined />
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Отмена" color="primary" @click="closeDialog" />
-          <q-btn flat label="Добавить" color="primary" @click="addMaterial" />
+          <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
+          <q-btn flat label="Добавить" color="yellow" @click="addMaterial" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -544,5 +559,12 @@ const addMaterial = () => {
 </template>
 
 <style scoped>
+
+.fab {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000; /* чтобы кнопка была поверх остальных элементов */
+}
 
 </style>
