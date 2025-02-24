@@ -382,7 +382,7 @@ const addMaterial = () => {
                       style="width: 100%"
               >
 
-                <q-item-section class="col-8">
+                <q-item-section class="col-7">
                   <q-item-label class="text-left">
                     {{ material.name }}
                   </q-item-label>
@@ -405,6 +405,10 @@ const addMaterial = () => {
                   <q-item-label class="text-right">
                     {{material.price * material.amount}}р
                   </q-item-label>
+                </q-item-section>
+
+                <q-item-section class="col-auto" v-if="editMode">
+                  <q-btn icon="delete_forever" @click="materials.splice(index, 1)" color="red" flat round />
                 </q-item-section>
 
               </q-item>
@@ -459,8 +463,15 @@ const addMaterial = () => {
             <q-item-label v-if="!servicesByCategory">Нет сервисов</q-item-label>
             <q-item v-for="service in servicesByCategory"
                     :key="service"
-                    class="w-100 justify-between"
+                    class="w-100 justify-between selectService"
                     style="width: 100%"
+                    clickable
+                    v-ripple
+                    @click="services.push({ ...service })"
+                    :q-item
+                    :class="{
+                      'text-yellow': services.some(s => s.id === service.id),
+                     }"
             >
 
               <q-item-section >
@@ -559,6 +570,11 @@ const addMaterial = () => {
 </template>
 
 <style scoped>
+
+.selectService:hover {
+  background-color: yellow;
+  color: black
+}
 
 .fab {
   position: fixed;
