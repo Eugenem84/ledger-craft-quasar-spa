@@ -35,6 +35,20 @@ const tab = ref('all')
 
 const editMode = ref(false)
 
+const showAddNewMaterialDialog = ref(false)
+const showAddNewServiceDialog = ref(false)
+
+const newMaterial = ref({
+  name: '',
+  price: 0,
+  amount: 0
+})
+
+const newService = ref({
+  name: '',
+  price: 0,
+})
+
 // const openAddMaterialDialog = () => {
 //   $q.dialog({
 //     title: 'добавление материала',
@@ -209,17 +223,24 @@ const computedToggleColor = computed(() => {
   }
 })
 
-
-const showDialog = ref(false)
-const newMaterial = ref({
-  name: '',
-  price: 0,
-  amount: 0
-})
-
 const closeDialog = () => {
-  showDialog.value = false
+  showAddNewMaterialDialog.value = false
+  showAddNewServiceDialog.value = false
   newMaterial.value = { name: '', price: 0, amount: 0 }
+}
+
+const addNewService = async () => {
+  try {
+    const response = await api.post('/add_service', {
+      service: newService.value.name,
+      price: newService.value.price,
+      category_id: selectedServiceCategory.value
+    })
+    console.log('response: ', response)
+    closeDialog()
+  } catch (err) {
+    console.error('ошибка создание нового сервиса:  ',err)
+  }
 }
 
 const addMaterial = () => {
@@ -231,7 +252,7 @@ const addMaterial = () => {
     console.log('Добавление нового материала:', { ...newMaterial.value })
     materials.value.push(newMaterial.value)
     newMaterial.value = { name: '', price: 0, amount: 0 }
-    showDialog.value = false
+    showAddNewMaterialDialog.value = false
     console.log('materials: ', materials)
   } else {
     console.error('Введите корректные данные')
@@ -346,8 +367,8 @@ const addMaterial = () => {
             <q-list bordered separator >
 
               <q-item-label v-if="!services">Нет сервисов</q-item-label>
-              <q-item v-for="service in services"
-                      :key="service"
+              <q-item v-for="(service, index) in services"
+                      :key="index"
                       class="w-100 justify-between"
                       style="width: 100%"
               >
@@ -363,6 +384,11 @@ const addMaterial = () => {
                       <q-item-label class="text-right">
                         {{ service.price }}р
                       </q-item-label>
+                </q-item-section>
+
+
+                <q-item-section class="col-auto" v-if="editMode">
+                  <q-btn icon="delete_forever" @click="services.splice(index, 1)" color="red" flat round />
                 </q-item-section>
 
               </q-item>
@@ -434,6 +460,8 @@ const addMaterial = () => {
           <q-input type="textarea"
                    v-model="comments"
                    label="комментарии"
+                   label-color="yellow"
+                   color="yellow"
                    autogrow
                    placeholder="Коментариев нет"
                    :disable="!editMode"
@@ -486,6 +514,14 @@ const addMaterial = () => {
                 </q-item-label>
               </q-item-section>
 
+              <q-btn
+                icon="add"
+                round
+                class="fab bg-yellow text-black"
+                @click="showAddNewServiceDialog = true"
+                size="20px"
+              />
+
             </q-item>
           </q-list>
 
@@ -531,7 +567,7 @@ const addMaterial = () => {
             icon="add"
             round
             class="fab bg-yellow text-black"
-            @click="showDialog = true"
+            @click="showAddNewMaterialDialog = true"
             size="20px"
           />
 
@@ -551,7 +587,7 @@ const addMaterial = () => {
   </div>
 
   <div>
-    <q-dialog v-model="showDialog" persistent>
+    <q-dialog v-model="showAddNewMaterialDialog" persistent>
       <q-card>
         <q-card-section>
           <div class="text-h6">Добавление материала</div>
@@ -562,6 +598,22 @@ const addMaterial = () => {
         <q-card-actions align="right">
           <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
           <q-btn flat label="Добавить" color="yellow" @click="addMaterial" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
+
+  <div>
+    <q-dialog v-model="showAddNewServiceDialog" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Добавление материала</div>
+          <q-input v-model="newService.name" label-color="yellow" color="yellow" label="Название" outlined class="q-mb-md" />
+          <q-input v-model.number="newService.price" label="Цена" label-color="yellow" color="yellow" type="number" outlined class="q-mb-md" />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
+          <q-btn flat label="Добавить" color="yellow" @click="addNewService" />
         </q-card-actions>
       </q-card>
     </q-dialog>
