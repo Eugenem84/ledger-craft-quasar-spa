@@ -21,7 +21,12 @@ const paid = ref(false)
 const order = ref(null)
 const services = ref(null)
 const materials =ref(null)
-const clientName = ref(null)
+//const clientName = ref(null)
+const client = ref({
+  id:null,
+  name: null,
+  phone: null
+})
 const clientId = ref(null)
 const modelId = ref(null)
 const comments = ref(null)
@@ -29,7 +34,7 @@ const comments = ref(null)
 const clients = ref(null)
 const models = ref(null)
 
-const model = ref(null)
+const model = ref({id: null, name: null})
 
 const selectedServiceCategory = ref(null)
 
@@ -53,21 +58,6 @@ const newService = ref({
   name: '',
   price: 0,
 })
-
-// const openAddMaterialDialog = () => {
-//   $q.dialog({
-//     title: 'добавление материала',
-//     message: 'сообщение',
-//     cancel: true,
-//     persistent: false
-//   }).onOk(() => {
-//     console.log('добавление нового материала')
-//   }).onDismiss(() => {
-//     console.log('отмена')
-//   }).onCancel(() => {
-//     console.log('закрыт диалог')
-//   })
-// }
 
 const getServices = async () => {
   try {
@@ -148,7 +138,8 @@ onMounted(() => {
   console.log('ордер: ', order.value)
   paid.value = order.value.paid
   orderStatus.value = order.value.status
-  clientName.value = order.value.client_name
+  client.value.name = order.value.client_name
+  client.value.id = order.value.client_id
   clientId.value = order.value.client_id
   modelId.value = order.value.model_id
   if (order.value.model_id){
@@ -182,9 +173,13 @@ const getModels = async () => {
   }
 }
 
-const activeEditMode = () => {
-  getClients()
-  getModels()
+const activeEditMode = async () => {
+  await getClients()
+  console.log('client_id: ', order.value.client_id)
+  client.value.id = order.value.client_id
+  await getModels()
+  console.log('model_id: ', order.value.model_id)
+  model.value.id = order.value.model_id
   editMode.value = true
 }
 
@@ -192,10 +187,11 @@ const updateOrder = async () => {
   console.log('обновляем ордер на сервере')
   try {
     const totalAmount = totalSumServices.value + totalSumMaterials.value
-    console.log('client_id: ', clientName.value.id)
+    console.log('client_id: ', client.value.id)
+    console.log('model_id', model.value.id)
     const response = await api.post('/update_order', {
       id: order.value.id,
-      client_id: clientName.value.id,
+      client_id: client.value.id,
       model_id: model.value.id,
       specialization_id: selectedSpecializationId,
       user_order_number: '',
@@ -351,7 +347,7 @@ const addMaterial = () => {
   </div>
 
   <div class="row q-col-gutter-md">
-    <q-select v-model="clientName"
+    <q-select v-model="client"
               :options="clients"
               option-value="id"
               option-label="name"
