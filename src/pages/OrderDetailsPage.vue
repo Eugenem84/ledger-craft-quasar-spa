@@ -26,6 +26,11 @@ const clientId = ref(null)
 const modelId = ref(null)
 const comments = ref(null)
 
+const clients = ref(null)
+const models = ref(null)
+
+const model = ref(null)
+
 const selectedServiceCategory = ref(null)
 
 const serviceCategories = ref(null)
@@ -103,7 +108,7 @@ const updateOrderStatus = async () => {
   }
 }
 
-const geMaterialsByOrder = async () => {
+const getMaterialsByOrder = async () => {
   try {
     const orderId = order.value.id
     const response = await api.get(`/get_materials_by_order/${orderId}`)
@@ -153,11 +158,33 @@ onMounted(() => {
     comments.value = order.value.comments
   }
   getServices()
-  geMaterialsByOrder()
+  getMaterialsByOrder()
   getServiceCategories()
 })
 
+const getClients = async () => {
+  try {
+    const response = await api.get(`/get_clients/${selectedSpecializationId}`)
+    clients.value = response.data
+    console.log('clients: ', clients)
+  } catch (err) {
+    console.error('ошибка получения клиентов: ', err)
+  }
+}
+
+const getModels = async () => {
+  try {
+    const response = await api.get(`/get_equipment_models/${selectedSpecializationId}`)
+    models.value = response.data
+    console.log('models: ', models)
+  } catch (err) {
+    console.error('ошибка получения моделей: ', err)
+  }
+}
+
 const activeEditMode = () => {
+  getClients()
+  getModels()
   editMode.value = true
 }
 
@@ -165,11 +192,11 @@ const updateOrder = async () => {
   console.log('обновляем ордер на сервере')
   try {
     const totalAmount = totalSumServices.value + totalSumMaterials.value
-    console.log('totalAmount: ', totalAmount)
+    console.log('client_id: ', clientName.value.id)
     const response = await api.post('/update_order', {
       id: order.value.id,
-      client_id: clientId.value,
-      model_id: modelId.value,
+      client_id: clientName.value.id,
+      model_id: model.value.id,
       specialization_id: selectedSpecializationId,
       user_order_number: '',
       total_amount: totalAmount,
@@ -325,18 +352,26 @@ const addMaterial = () => {
 
   <div class="row q-col-gutter-md">
     <q-select v-model="clientName"
-              :options="[clientName]"
+              :options="clients"
+              option-value="id"
+              option-label="name"
               label="клиент"
               dense
-              disable class="col"
+              :disable="!editMode"
+              class="col"
+              color="yellow"
     />
 
-    <q-select v-model="modelId"
-              :options="[modelId]"
+    <q-select v-model="model"
+              :options="models"
+              option-value="id"
+              option-label="name"
               label="модель"
-              disable class="col"
+              :disable="!editMode"
+              class="col"
               dense
-              :display-value="modelId === null ? 'нет модели' : modelId" />
+              color="yellow"
+    />
   </div>
 
   <div>
