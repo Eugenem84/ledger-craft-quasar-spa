@@ -48,6 +48,7 @@ const editMode = ref(false)
 const showAddNewMaterialDialog = ref(false)
 const showAddNewServiceDialog = ref(false)
 const showAddNewClientDialog = ref(false)
+const showAddNewModelDialog = ref(false)
 
 const newMaterial = ref({
   name: '',
@@ -63,6 +64,10 @@ const newService = ref({
 const newClient = ref({
   name: '',
   phone: '',
+})
+
+const newModel = ref({
+  name: '',
 })
 
 const getServices = async () => {
@@ -298,16 +303,24 @@ const addNewClient = async () => {
       specialization_id: selectedSpecializationId
     })
     showAddNewClientDialog.value = false
-    console.log('response: ', response)
-    console.log('clients: ', clients)
-    console.log('client: ', client)
     getClients()
-    console.log('clients: ', clients)
     client.value = response.data.client
-    console.log('client: ', client)
-
   } catch (err) {
     console.error('ошибка добавления клиента: ', err)
+  }
+}
+
+const addNewModel = async () => {
+  try {
+    const response = await api.post('/add_equipment_model', {
+      name: newModel.value.name,
+      specialization_id: selectedSpecializationId
+    })
+    showAddNewModelDialog.value = false
+    getModels()
+    model.value = response.data.model
+  } catch (err){
+    console.error(err)
   }
 }
 
@@ -403,7 +416,7 @@ const addNewClient = async () => {
     />
 
     <div class="col-auto self-end" v-if="editMode">
-      <q-btn class="col-auto text-yellow">+</q-btn>
+      <q-btn class="col-auto text-yellow" @click="showAddNewModelDialog=true">+</q-btn>
     </div>
 
   </div>
@@ -699,6 +712,21 @@ const addNewClient = async () => {
         <q-card-actions align="right">
           <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
           <q-btn flat label="Добавить" color="yellow" @click="addNewClient" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
+
+  <div>
+    <q-dialog v-model="showAddNewModelDialog" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Добавление модели</div>
+          <q-input v-model="newModel.name" label-color="yellow" color="yellow" label="Название модели" outlined class="q-mb-md" />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
+          <q-btn flat label="Добавить" color="yellow" @click="addNewModel" />
         </q-card-actions>
       </q-card>
     </q-dialog>
