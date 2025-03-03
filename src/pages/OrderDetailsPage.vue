@@ -47,6 +47,7 @@ const editMode = ref(false)
 
 const showAddNewMaterialDialog = ref(false)
 const showAddNewServiceDialog = ref(false)
+const showAddNewClientDialog = ref(false)
 
 const newMaterial = ref({
   name: '',
@@ -57,6 +58,11 @@ const newMaterial = ref({
 const newService = ref({
   name: '',
   price: 0,
+})
+
+const newClient = ref({
+  name: '',
+  phone: '',
 })
 
 const getServices = async () => {
@@ -142,6 +148,7 @@ onMounted(() => {
   client.value.id = order.value.client_id
   clientId.value = order.value.client_id
   modelId.value = order.value.model_id
+  model.value.name = order.value.model_name
   if (order.value.model_id){
     modelId.value = order.value.model_id
   }
@@ -247,6 +254,7 @@ const computedToggleColor = computed(() => {
 })
 
 const closeDialog = () => {
+  showAddNewClientDialog.value = false
   showAddNewMaterialDialog.value = false
   showAddNewServiceDialog.value = false
   newMaterial.value = { name: '', price: 0, amount: 0 }
@@ -279,6 +287,27 @@ const addMaterial = () => {
     console.log('materials: ', materials)
   } else {
     console.error('Введите корректные данные')
+  }
+}
+
+const addNewClient = async () => {
+  try {
+    const response = await api.post('/add_client', {
+      name: newClient.value.name,
+      phone: newClient.value.phone,
+      specialization_id: selectedSpecializationId
+    })
+    showAddNewClientDialog.value = false
+    console.log('response: ', response)
+    console.log('clients: ', clients)
+    console.log('client: ', client)
+    getClients()
+    console.log('clients: ', clients)
+    client.value = response.data.client
+    console.log('client: ', client)
+
+  } catch (err) {
+    console.error('ошибка добавления клиента: ', err)
   }
 }
 
@@ -346,7 +375,7 @@ const addMaterial = () => {
     />
   </div>
 
-  <div class="row q-col-gutter-md">
+  <div class="row items-center" >
     <q-select v-model="client"
               :options="clients"
               option-value="id"
@@ -358,6 +387,10 @@ const addMaterial = () => {
               color="yellow"
     />
 
+    <div class="col-auto self-end" v-if="editMode">
+      <q-btn class="col-auto text-yellow" @click="showAddNewClientDialog=true">+</q-btn>
+    </div>
+
     <q-select v-model="model"
               :options="models"
               option-value="id"
@@ -368,6 +401,11 @@ const addMaterial = () => {
               dense
               color="yellow"
     />
+
+    <div class="col-auto self-end" v-if="editMode">
+      <q-btn class="col-auto text-yellow">+</q-btn>
+    </div>
+
   </div>
 
   <div>
@@ -645,6 +683,22 @@ const addMaterial = () => {
         <q-card-actions align="right">
           <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
           <q-btn flat label="Добавить" color="yellow" @click="addNewService" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
+
+  <div>
+    <q-dialog v-model="showAddNewClientDialog" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Добавление клиента</div>
+          <q-input v-model="newClient.name" label-color="yellow" color="yellow" label="Имя клиента" outlined class="q-mb-md" />
+          <q-input v-model.number="newClient.phone" label="телефон" label-color="yellow" color="yellow" type="text" outlined class="q-mb-md" />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
+          <q-btn flat label="Добавить" color="yellow" @click="addNewClient" />
         </q-card-actions>
       </q-card>
     </q-dialog>
