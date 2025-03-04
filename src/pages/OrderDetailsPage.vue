@@ -487,7 +487,7 @@ const addProductFromStore = () => {
         align="justify"
         narrow-indicator
       >
-        <q-tab name="all" :label="'работ: ' + (services ? services.length : 0) +  ' материалов: ' + (materials ? materials.length + products.length : 0)" />
+        <q-tab name="all"   :label="`работ: ${(services?.length || 0)} материалов: ${(materials?.length || 0) + (products?.length || 0)}`"  />
         <q-tab name="servicesChoice" v-if="editMode" label="работы" />
         <q-tab name="materialsChoice" v-if="editMode" label="материалы" />
       </q-tabs>
