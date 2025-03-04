@@ -24,6 +24,12 @@ const goToOrderDetails = (order) => {
   router.push(`/orders/${order.id}`)
 }
 
+const goToNewOrder = () => {
+  console.log('не реализовано')
+  orderStore.clearCurrentOrder()
+  router.push({ name: `new-order`})
+}
+
 const getOrders = async () => {
   loading.value = true
   try {
@@ -101,11 +107,30 @@ onMounted(() => {
         </q-item-section>
 
       </q-item>
+
     </q-list>
+
+    <!-- Плавающая кнопка добавления нового материала -->
+    <q-btn
+      icon="add"
+      round
+      class="fab bg-yellow text-black"
+      @click="goToNewOrder"
+      size="20px"
+    />
+
   </q-page>
+
 </template>
 
 <style scoped>
+
+.fab {
+  position: fixed;
+  bottom: 70px;
+  right: 16px;
+  z-index: 1000; /* чтобы кнопка была поверх остальных элементов */
+}
 
 .border-waiting {
   border-left: 3px solid yellow;

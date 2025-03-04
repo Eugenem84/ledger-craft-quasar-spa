@@ -7,8 +7,14 @@ export const useOrderStore = defineStore('order', () => {
   const setOrder = (order) => {
     currentOrder.value = order
   }
+
+  const clearCurrentOrder = () => {
+    currentOrder.value = null
+  }
+
   return {
     currentOrder,
-    setOrder
+    setOrder,
+    clearCurrentOrder
   }
 })

@@ -4,10 +4,11 @@ import {useOrderStore} from "stores/order.js";
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
 import {useRouter} from "vue-router";
-//import {useQuasar} from "quasar";
+
+import {useQuasar} from "quasar";
 //import {data} from "autoprefixer";
 
-//const $q = useQuasar()
+const $q = useQuasar()
 
 const router = useRouter()
 const specializationsStore = useSpecializationsStore()
@@ -19,12 +20,12 @@ const orderStatus = ref('waiting');
 const paid = ref(false)
 
 const order = ref(null)
-const services = ref(null)
-const materials =ref(null)
+const services = ref([])
+const materials =ref([])
 
-const storeProducts = ref(null)
-const products = ref(null)
-const productCategories = ref(null)
+const storeProducts = ref([])
+const products = ref([])
+const productCategories = ref([])
 const selectedStoreProduct = ref(null)
 const selectedProductCategory = ref(null)
 
@@ -52,6 +53,7 @@ const servicesByCategory = ref(null)
 const tab = ref('all')
 
 const editMode = ref(false)
+const isNewOrder = computed(() => !order.value?.id)
 
 const showAddNewMaterialDialog = ref(false)
 const showAddNewServiceDialog = ref(false)
@@ -155,6 +157,7 @@ const getServiceCategories = async () => {
 
 const getServicesByCategory = async (categoryId) => {
   console.log('подгружаем сервисы категории: ', categoryId)
+  console.log('selectedServiceCategory: ', selectedServiceCategory)
   try {
     const response = await api.get(`/get_service/${categoryId}`)
     servicesByCategory.value = response.data
@@ -165,23 +168,40 @@ const getServicesByCategory = async (categoryId) => {
 }
 
 onMounted(() => {
-  order.value = orderStore.currentOrder
-  console.log('ордер: ', order.value)
-  paid.value = order.value.paid
-  orderStatus.value = order.value.status
-  client.value.name = order.value.client_name
-  client.value.id = order.value.client_id
-  clientId.value = order.value.client_id
-  modelId.value = order.value.model_id
-  model.value.name = order.value.model_name
-  if (order.value.model_id){
+  if(orderStore.currentOrder){
+    order.value = orderStore.currentOrder
+    console.log('ордер: ', order.value)
+    paid.value = order.value.paid
+    orderStatus.value = order.value.status
+    client.value.name = order.value.client_name
+    client.value.id = order.value.client_id
+    clientId.value = order.value.client_id
     modelId.value = order.value.model_id
+    model.value.name = order.value.model_name
+    if (order.value.model_id){
+      modelId.value = order.value.model_id
+    }
+    if (order.value.comments) {
+      comments.value = order.value.comments
+    }
+    getServices()
+    getMaterialsByOrder()
+  } else {
+    console.log('режим нового ордера')
+    order.value = {
+      status: 'waiting',
+      paid: false,
+      clientId: null,
+      modelId: null,
+      comments: ''
+    }
+    editMode.value = true
+    getProductCategories()
   }
-  if (order.value.comments) {
-    comments.value = order.value.comments
-  }
-  getServices()
-  getMaterialsByOrder()
+  getClients()
+  getModels()
+  //getServices()
+  //getMaterialsByOrder()
   getServiceCategories()
 })
 
@@ -227,6 +247,7 @@ const getProductsByCategory = async (selectedProductCategory) => {
 }
 
 const activeEditMode = async () => {
+  console.log('активен режим редактора ордера')
   await getClients()
   console.log('client_id: ', order.value.client_id)
   client.value.id = order.value.client_id
@@ -235,6 +256,48 @@ const activeEditMode = async () => {
   model.value.id = order.value.model_id
   editMode.value = true
   await getProductCategories()
+}
+
+const saveOrder = async () => {
+  try {
+    if(isNewOrder.value){
+      await createOrder()
+    } else {
+      await updateOrder()
+    }
+  } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка сохранения заказа'
+    })
+    console.error('ошибка сохранения заказа: ', err)
+  }
+
+}
+
+const createOrder = async () => {
+  console.log('сохроняем новый ордер')
+  try {
+    const response = await api.post(`/save_order`, {
+      clientId: client.value.id,
+      modelId: model.value.id,
+      specializationId: selectedSpecializationId,
+      totalAmount: totalSumProducts.value + totalSumMaterials.value + totalSumServices.value,
+      addedMaterials: materials.value,
+      addedProducts: products.value,
+      services: services.value,
+      comments: comments.value,
+      paid: paid.value,
+      userOrderNumber: '',
+      status: orderStatus.value,
+      materials: ''
+    })
+    console.log('response: ', response)
+    console.log('переход не реализован')
+    router.back()
+  } catch (err){
+    console.error(err)
+  }
 }
 
 const updateOrder = async () => {
@@ -313,6 +376,7 @@ const closeDialog = () => {
   showAddNewClientDialog.value = false
   showAddNewMaterialDialog.value = false
   showAddNewServiceDialog.value = false
+  showAddNewModelDialog.value = false
   newMaterial.value = { name: '', price: 0, amount: 0 }
 }
 
@@ -449,7 +513,7 @@ const addProductFromStore = () => {
            size="sm"
            color="yellow"
            label="сохр"
-           @click="updateOrder"
+           @click="saveOrder"
     />
   </div>
 
@@ -498,7 +562,9 @@ const addProductFromStore = () => {
         align="justify"
         narrow-indicator
       >
-        <q-tab name="all"   :label="`работ: ${(services?.length || 0)} материалов: ${(materials?.length || 0) + (products?.length || 0)}`"  />
+        <q-tab name="all"
+               :label="`работ: ${(services?.length || 0)} материалов: ${(materials?.length || 0) + (products?.length || 0)}`"
+        />
         <q-tab name="servicesChoice" v-if="editMode" label="работы" />
         <q-tab name="materialsChoice" v-if="editMode" label="материалы" />
       </q-tabs>

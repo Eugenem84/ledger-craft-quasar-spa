@@ -16,6 +16,12 @@ const routes = [
     component: () => import('pages/OrderDetailsPage.vue'),
     meta: { hideFooter: true, requiredAuth: true}
   },
+  {
+    path: '/orders/new',
+    component: () => import('pages/OrderDetailsPage.vue'),
+    meta: { hideFooter: true, requiredAuth: true},
+    name: 'new-order'
+  },
 
   // Always leave this as last one,
   // but you can also remove it
