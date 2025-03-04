@@ -21,6 +21,13 @@ const paid = ref(false)
 const order = ref(null)
 const services = ref(null)
 const materials =ref(null)
+
+const products = ref(null)
+const productCategories = ref(null)
+const selectedProduct = ref(null)
+const selectedProductCategory = ref(null)
+
+
 //const clientName = ref(null)
 const client = ref({
   id:null,
@@ -49,6 +56,7 @@ const showAddNewMaterialDialog = ref(false)
 const showAddNewServiceDialog = ref(false)
 const showAddNewClientDialog = ref(false)
 const showAddNewModelDialog = ref(false)
+const showAddProductFromStoreDialog = ref(false)
 
 const newMaterial = ref({
   name: '',
@@ -113,8 +121,19 @@ const getMaterialsByOrder = async () => {
   try {
     const orderId = order.value.id
     const response = await api.get(`/get_materials_by_order/${orderId}`)
-    materials.value = response.data
-    console.log('materials:', materials.value)
+
+    materials.value = []
+    products.value = []
+
+    response.data.forEach(item => {
+      if (item.product_id) {
+        products.value.push({...item})
+      } else {
+        materials.value.push({...item})
+      }
+    })
+    console.log('materials: ', materials.value)
+    console.log('products: ', products.value)
   } catch (err) {
     console.error('ошибка получения материалов: ', err)
   }
@@ -185,6 +204,27 @@ const getModels = async () => {
   }
 }
 
+const getProductCategories = async () => {
+  try {
+    const response = await api.get(`/get_product_categories/${selectedSpecializationId}`)
+    productCategories.value = response.data
+    console.log('productCategories: ', productCategories.value)
+  } catch (err){
+    console.error(err)
+  }
+}
+
+const getProductsByCategory = async (selectedProductCategory) => {
+  selectedProduct.value = null
+  try {
+    const response = await api.get(`/get_products/${selectedProductCategory.id}`)
+    products.value = response.data
+    console.log('products: ', products.value)
+  } catch (err){
+    console.error(err)
+  }
+}
+
 const activeEditMode = async () => {
   await getClients()
   console.log('client_id: ', order.value.client_id)
@@ -193,6 +233,7 @@ const activeEditMode = async () => {
   console.log('model_id: ', order.value.model_id)
   model.value.id = order.value.model_id
   editMode.value = true
+  await getProductCategories()
 }
 
 const updateOrder = async () => {
@@ -209,7 +250,7 @@ const updateOrder = async () => {
       user_order_number: '',
       total_amount: totalAmount,
       materials: materials.value,
-      products: '',
+      products: products.value,
       comments: comments.value,
       services: services.value.map(service => service.id),
       paid: paid.value
@@ -243,6 +284,15 @@ const totalSumMaterials = computed(() => {
     const amount = Number(material.amount) || 0;
     return sum + price * amount;
   }, 0);
+})
+
+const totalSumProducts = computed(() => {
+  if (!products.value) return 0
+  return products.value.reduce((sum, product) => {
+    const price = Number(product.price) || 0
+    const amount = Number(product.amount) || 0
+    return sum + price * amount
+  }, 0)
 })
 
 const computedToggleColor = computed(() => {
@@ -322,6 +372,10 @@ const addNewModel = async () => {
   } catch (err){
     console.error(err)
   }
+}
+
+const addProductFromStore = () => {
+  console.log('не реализовано')
 }
 
 </script>
@@ -433,7 +487,7 @@ const addNewModel = async () => {
         align="justify"
         narrow-indicator
       >
-        <q-tab name="all" :label="'работ: ' + (services ? services.length : 0) +  ' материалов: ' + (materials ? materials.length : 0)" />
+        <q-tab name="all" :label="'работ: ' + (services ? services.length : 0) +  ' материалов: ' + (materials ? materials.length + products.length : 0)" />
         <q-tab name="servicesChoice" v-if="editMode" label="работы" />
         <q-tab name="materialsChoice" v-if="editMode" label="материалы" />
       </q-tabs>
@@ -522,8 +576,50 @@ const addNewModel = async () => {
               </q-item>
             </q-list>
 
+            <!-- отображение списка продуктов -->
+            <q-list bordered separator >
+
+              <q-item-label v-if="!products">Нет материалов</q-item-label>
+              <q-item v-for="product in products"
+                      :key="product"
+                      class="w-100 justify-between row"
+                      style="width: 100%"
+              >
+
+                <q-item-section class="col-7">
+                  <q-item-label class="text-left">
+                    {{ product.name }}
+                  </q-item-label>
+                </q-item-section>
+
+
+                <q-item-section class="col-1">
+                  <q-item-label class="text-right">
+                    {{ product.price }}р
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section class="col-1">
+                  <q-item-label class="text-center">
+                    х{{product.amount}}
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section class="col-1">
+                  <q-item-label class="text-right">
+                    {{product.price * product.amount}}р
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section class="col-auto" v-if="editMode">
+                  <q-btn icon="delete_forever" @click="products.splice(index, 1)" color="red" flat round />
+                </q-item-section>
+
+              </q-item>
+            </q-list>
+
             <div class="text-grey text-left" v-show="totalSumMaterials > 0 && totalSumServices > 0">
-              всего по материалам: {{totalSumMaterials}}р
+              всего по материалам: {{totalSumMaterials + totalSumProducts}}р
             </div>
 
             <div class="text-grey text-center display: flex" >
@@ -532,7 +628,7 @@ const addNewModel = async () => {
               </div>
 
               <div class="text-green">
-                {{totalSumMaterials + totalSumServices}}
+                {{totalSumMaterials + totalSumProducts + totalSumServices}}
               </div>
               р
             </div>
@@ -612,6 +708,8 @@ const addNewModel = async () => {
         <!-- панель выбора материалов -->
         <q-tab-panel name="materialsChoice" style="padding: 0">
 
+          <div class="text-center text-grey">материалы: {{totalSumMaterials}}р</div>
+          <!-- отображение материалов -->
           <q-list bordered separator>
             <q-item-label v-if="!materials"> нет материалов</q-item-label>
             <q-item v-for="(material, index) in materials"
@@ -622,7 +720,6 @@ const addNewModel = async () => {
               <q-item-section class="col-7">
                 <q-input v-model="material.name" />
               </q-item-section>
-
 
               <q-item-section class="col-1">
                 <q-input v-model="material.price" input-class="text-right"/>
@@ -644,6 +741,41 @@ const addNewModel = async () => {
 
           </q-list>
 
+          <div class="text-center text-grey">продукты: {{totalSumProducts}} р</div>
+
+          <!-- отображение продуктов -->
+          <q-list bordered separator>
+            <q-item-label v-if="!products"> нет материалов</q-item-label>
+            <q-item v-for="(product, index) in products"
+                    :key="index"
+                    class="w-100 justify-between row"
+            >
+
+              <q-item-section class="col-7">
+                <q-input v-model="product.name" />
+              </q-item-section>
+
+
+              <q-item-section class="col-1">
+                <q-input v-model="product.price" input-class="text-right"/>
+              </q-item-section>
+
+              <q-item-section class="col-1">
+                <q-input v-model="product.amount" input-class="text-right" prefix="x" />
+              </q-item-section>
+
+              <q-item-section class="col-1" disabled="disabled" input-class="text-right" >
+                <q-input :model-value="product.price * product.amount" />
+              </q-item-section>
+
+              <q-item-section class="col-auto">
+                <q-btn icon="delete_forever" @click="products.splice(index, 1)" color="red" flat round />
+              </q-item-section>
+
+            </q-item>
+
+          </q-list>
+
           <!-- Плавающая кнопка добавления нового материала -->
           <q-btn
             icon="add"
@@ -658,7 +790,7 @@ const addNewModel = async () => {
             round
             class="bg-yellow text-black"
             size="18"
-            @click="console.log('добавление со склада не реализовано')"
+            @click="showAddProductFromStoreDialog = true"
             style="position: fixed; bottom: 100px; right: 16px; z-index: 1000"
           />
 
@@ -727,6 +859,34 @@ const addNewModel = async () => {
         <q-card-actions align="right">
           <q-btn flat label="Отмена" color="yellow" @click="closeDialog" />
           <q-btn flat label="Добавить" color="yellow" @click="addNewModel" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </div>
+
+  <div>
+    <q-dialog v-model="showAddProductFromStoreDialog" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Добавление товара со склада</div>
+          <q-select v-model="selectedProductCategory"
+                    :options="productCategories"
+                    option-label="name"
+                    label="Выберите категорию"
+                    @update:model-value="getProductsByCategory"
+                    label-color="yellow"
+          />
+          <q-select v-model="selectedProduct"
+                    :options="products"
+                    option-label="name"
+                    label="выберите товар"
+                    label-color="yellow"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="отмена" color="yellow" @click="showAddProductFromStoreDialog=false" />
+          <q-btn flat label="добавить" color="yellow" @click="addProductFromStore" />
         </q-card-actions>
       </q-card>
     </q-dialog>
