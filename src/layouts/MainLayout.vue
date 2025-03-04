@@ -58,6 +58,7 @@
         indicator-color="yellow"
         >
         <q-route-tab to="/orders" name="orders" label="Ордеры" icon="list"/>
+        <q-route-tab to="/store" name="store" label="склад" icon="storage" />
         <q-route-tab to="/catalog" name="catalog" label="Каталог" icon="folder" />
         <q-route-tab to="/analytic" name="analytic" label="Аналитика" icon="bar_chart" />
         <q-route-tab to="/other" name="other" label="другое" icon="more_horiz" />

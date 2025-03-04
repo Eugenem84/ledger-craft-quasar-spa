@@ -60,7 +60,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <q-page class="q-pa-none">
+  <q-page class="q-pa-none" style="padding: 0">
     <q-list bordered separator>
       <q-item-label v-if="orders.length === 0">Нет данных</q-item-label>
       <q-item v-for="order in orders"

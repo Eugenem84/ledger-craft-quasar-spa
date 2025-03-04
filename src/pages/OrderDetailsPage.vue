@@ -689,7 +689,7 @@ const addProductFromStore = () => {
                 </q-item-section>
 
                 <q-item-section class="col-auto" v-if="editMode">
-                  <q-btn icon="delete_forever" @click="addedProducts.splice(index, 1)" color="red" flat round />
+                  <q-btn icon="delete_forever" @click="products.splice(index, 1)" color="red" flat round />
                 </q-item-section>
 
               </q-item>

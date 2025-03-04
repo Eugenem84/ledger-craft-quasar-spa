@@ -5,6 +5,7 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: 'orders', component: () => import('pages/OrdersPage.vue'), meta: { requiresAuth: true }},
+      { path: 'store', component: () => import('pages/StorePage.vue'), meta: {requiresAuth: true }},
       { path: 'analytic', component: () => import('pages/AnalyticPage.vue'), meta: { requiresAuth: true }},
       { path: 'other', component: () => import('pages/OtherPage.vue'), meta: { requiresAuth: true }},
       { path: 'catalog', component: () => import('pages/CatalogPage.vue'), meta: { requiresAuth: true }},
