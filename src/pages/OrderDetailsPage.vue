@@ -22,9 +22,10 @@ const order = ref(null)
 const services = ref(null)
 const materials =ref(null)
 
+const storeProducts = ref(null)
 const products = ref(null)
 const productCategories = ref(null)
-const selectedProduct = ref(null)
+const selectedStoreProduct = ref(null)
 const selectedProductCategory = ref(null)
 
 
@@ -215,10 +216,10 @@ const getProductCategories = async () => {
 }
 
 const getProductsByCategory = async (selectedProductCategory) => {
-  selectedProduct.value = null
+  selectedStoreProduct.value = null
   try {
     const response = await api.get(`/get_products/${selectedProductCategory.id}`)
-    products.value = response.data
+    storeProducts.value = response.data
     console.log('products: ', products.value)
   } catch (err){
     console.error(err)
@@ -239,7 +240,7 @@ const activeEditMode = async () => {
 const updateOrder = async () => {
   console.log('обновляем ордер на сервере')
   try {
-    const totalAmount = totalSumServices.value + totalSumMaterials.value
+    const totalAmount = totalSumServices.value + totalSumMaterials.value + totalSumProducts.value
     console.log('client_id: ', client.value.id)
     console.log('model_id', model.value.id)
     const response = await api.post('/update_order', {
@@ -375,7 +376,17 @@ const addNewModel = async () => {
 }
 
 const addProductFromStore = () => {
-  console.log('не реализовано')
+  console.log('selectedStoreProduct: ', selectedStoreProduct.value)
+  //products.value.push(selectedStoreProduct.value)
+  const product = {
+    product_id: selectedStoreProduct.value.id,
+    name: selectedStoreProduct.value.name,
+    price: selectedStoreProduct.value.base_sale_price,
+    amount: 1
+  }
+  products.value.push(product)
+  console.log('products: ', products.value)
+  showAddProductFromStoreDialog.value = false
 }
 
 </script>
@@ -612,7 +623,7 @@ const addProductFromStore = () => {
                 </q-item-section>
 
                 <q-item-section class="col-auto" v-if="editMode">
-                  <q-btn icon="delete_forever" @click="products.splice(index, 1)" color="red" flat round />
+                  <q-btn icon="delete_forever" @click="addedProducts.splice(index, 1)" color="red" flat round />
                 </q-item-section>
 
               </q-item>
@@ -876,8 +887,8 @@ const addProductFromStore = () => {
                     @update:model-value="getProductsByCategory"
                     label-color="yellow"
           />
-          <q-select v-model="selectedProduct"
-                    :options="products"
+          <q-select v-model="selectedStoreProduct"
+                    :options="storeProducts"
                     option-label="name"
                     label="выберите товар"
                     label-color="yellow"
