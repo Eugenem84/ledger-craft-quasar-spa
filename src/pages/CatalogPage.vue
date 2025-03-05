@@ -52,6 +52,20 @@ const editClient = async () => {
   }
 }
 
+const deleteClient = async () => {
+  try {
+    const response = await api.post(`/delete_client`, {
+      clientId: selectedClient.value.id
+    })
+    console.log('response', response)
+    await getClients()
+    editClientMode.value = false
+    showClientsDetails.value = false
+  } catch (err){
+    console.error(err)
+  }
+}
+
 </script>
 
 <template>
@@ -120,7 +134,7 @@ const editClient = async () => {
       <q-card>
         <q-card-section>
           <div class="text-h6">клиент</div>
-          <q-input :disable="!editCientMode"
+          <q-input :disable="!editClientMode"
                    v-model="selectedClient.name"
                    label-color="yellow"
                    color="yellow"
@@ -128,7 +142,7 @@ const editClient = async () => {
                    outlined
                    class="q-mb-md"
           />
-          <q-input :disable="!editCientMode"
+          <q-input :disable="!editClientMode"
                    v-model="selectedClient.phone"
                    label-color="yellow"
                    color="yellow"
@@ -138,11 +152,11 @@ const editClient = async () => {
 
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn v-if="editCientMode" flat label="отмена" color="yellow" @click="editCientMode = false" />
-          <q-btn v-if="!editCientMode" flat label="закрыть" color="yellow" @click="showClientsDetails = false" />
-          <q-btn v-if="!editCientMode" flat label="редактировать" color="yellow" @click="editCientMode = true" />
-          <q-btn v-if="editCientMode" flat label="сохранить" color="yellow" @click="editClient" />
-          <q-btn v-if="!editCientMode" flat label="удалить" color="yellow" @click="console.log('не реализовано')" />
+          <q-btn v-if="editClientMode" flat label="отмена" color="yellow" @click="editClientMode = false" />
+          <q-btn v-if="!editClientMode" flat label="закрыть" color="yellow" @click="showClientsDetails = false" />
+          <q-btn v-if="!editClientMode" flat label="редактировать" color="yellow" @click="editClientMode = true" />
+          <q-btn v-if="editClientMode" flat label="сохранить" color="yellow" @click="editClient" />
+          <q-btn v-if="!editClientMode" flat label="удалить" color="yellow" @click="deleteClient" />
         </q-card-actions>
       </q-card>
     </q-dialog>
