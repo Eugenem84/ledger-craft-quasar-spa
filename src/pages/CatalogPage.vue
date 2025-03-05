@@ -7,7 +7,7 @@ const specializationStore = useSpecializationsStore()
 
 const tab = ref('services')
 
-const editCientMode = ref(false)
+const editClientMode = ref(false)
 
 const clients = ref([])
 const selectedClient = ref(null)
@@ -39,11 +39,14 @@ const editClient = async () => {
   try {
     console.log('отправление запроса на редактирование')
     const response = await api.post(`/edit_client`, {
+      id: selectedClient.value.id,
       name: selectedClient.value.name,
       phone: selectedClient.value.phone
     })
     console.log('response: ', response)
     await getClients()
+    editClientMode.value = false
+    showClientsDetails.value = false
   } catch (err){
     console.error(err)
   }
