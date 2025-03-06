@@ -35,7 +35,19 @@ onMounted(() => {
 })
 
 function handleDelete(){
-  //confirmDialog.value.open()
+  if (showClientsDetails.value) {
+    confirmDialog.value.open(
+      'Удаление клиента',
+      `Вы уверены что хотите удалить клиента "${selectedClient.value.name}" ?`,
+      () => {deleteClient()}
+    )
+  } else if (showServiceDetails.value){
+    confirmDialog.value.open(
+      'Удаление услуги',
+      `Вы уврены что хотите удалить сервис "${selectedService.value.service}"`,
+      () => {deleteService()}
+    )
+  }
 }
 
 const getClients = async () => {
@@ -65,7 +77,7 @@ const getServicesByCategory = async (categoryId) => {
   console.log('подгружаем сервисы категории: ', categoryId)
   console.log('selectedServiceCategory: ', selectedServiceCategory.value)
   try {
-    const response = await api.get(`/get_service/${categoryId}`)
+    const response = await api.get(`/get_service/${selectedServiceCategory.value}`)
     services.value = response.data
     console.log('подгружены сервисы категории: ', services.value)
   } catch (err) {
@@ -134,19 +146,19 @@ const deleteClient = async () => {
   }
 }
 
-// const deleteService = async () => {
-//   try {
-//     const response = await api.post(`/delete_client`, {
-//       serviceId: selectedService.value.id
-//     })
-//     console.log('response', response)
-//     await getServicesByCategory()
-//     editServiceMode.value = false
-//     showServiceDetails.value = false
-//   } catch (err){
-//     console.error(err)
-//   }
-// }
+const deleteService = async () => {
+  try {
+    const response = await api.post(`/delete_service`, {
+      serviceId: selectedService.value.id
+    })
+    console.log('response', response)
+    await getServicesByCategory()
+    editServiceMode.value = false
+    showServiceDetails.value = false
+  } catch (err){
+    console.error(err)
+  }
+}
 
 const openNewClientDialog = () => {
   newClientDialog.value.open()
@@ -357,16 +369,13 @@ const handleServiceAdded = (newServiceData) => {
           <q-btn v-if="!editServiceMode" flat label="закрыть" color="yellow" @click="showServiceDetails = false" />
           <q-btn v-if="!editServiceMode" flat label="редактировать" color="yellow" @click="editServiceMode = true" />
           <q-btn v-if="editServiceMode" flat label="сохранить" color="yellow" @click="editService" />
-          <q-btn v-if="!editServiceMode" flat label="удалить" color="yellow" @click="console.log('не реализовано')" />
+          <q-btn v-if="!editServiceMode" flat label="удалить" color="yellow" @click="handleDelete" />
         </q-card-actions>
       </q-card>
 
     </q-dialog>
 
-    <DeleteConfirmPage ref="confirmDialog"
-                       message="удаляем клиента"
-                       :onConfirm="deleteClient"
-    />
+    <DeleteConfirmPage ref="confirmDialog"/>
 
     <NewClientDialogPage ref="newClientDialog" @client-added="handleClientAdded" />
     <NewServiceDialogPage ref="newServiceDialog" @service-added="handleServiceAdded" :data="selectedServiceCategory" />
