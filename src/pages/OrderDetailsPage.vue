@@ -200,8 +200,6 @@ onMounted(() => {
   }
   getClients()
   getModels()
-  //getServices()
-  //getMaterialsByOrder()
   getServiceCategories()
 })
 

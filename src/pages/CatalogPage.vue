@@ -3,7 +3,9 @@ import {onMounted, ref} from 'vue'
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
 import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
+import NewClientDialogPage from "pages/dialogs/NewClientDialogPage.vue";
 
+const newClientDialog = ref(null)
 const confirmDialog = ref(null)
 const specializationStore = useSpecializationsStore()
 
@@ -72,6 +74,16 @@ const deleteClient = async () => {
   }
 }
 
+const openNewClientDialog = () => {
+  newClientDialog.value.open()
+}
+
+const handleClientAdded = (newClientData) => {
+  clients.value.push(newClientData.client)
+  console.log('newClientData', newClientData.client)
+  console.log('clients', clients.value)
+}
+
 </script>
 
 <template>
@@ -134,7 +146,7 @@ const deleteClient = async () => {
             icon="add"
             round
             class="fab bg-yellow text-black"
-            @click="console.log('не реализовано')"
+            @click="openNewClientDialog"
             size="20px"
           />
 
@@ -183,6 +195,8 @@ const deleteClient = async () => {
                        message="удаляем клиента"
                        :onConfirm="deleteClient"
     />
+
+    <NewClientDialogPage ref="newClientDialog" @client-added="handleClientAdded" />
 
   </div>
 
