@@ -2,7 +2,9 @@
 import {onMounted, ref} from 'vue'
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
+import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
 
+const confirmDialog = ref(null)
 const specializationStore = useSpecializationsStore()
 
 const tab = ref('services')
@@ -19,6 +21,10 @@ const showClientsDetails= ref(false)
 onMounted(() => {
   getClients()
 })
+
+function handleDelete(){
+  confirmDialog.value.open()
+}
 
 const getClients = async () => {
   try {
@@ -156,10 +162,16 @@ const deleteClient = async () => {
           <q-btn v-if="!editClientMode" flat label="закрыть" color="yellow" @click="showClientsDetails = false" />
           <q-btn v-if="!editClientMode" flat label="редактировать" color="yellow" @click="editClientMode = true" />
           <q-btn v-if="editClientMode" flat label="сохранить" color="yellow" @click="editClient" />
-          <q-btn v-if="!editClientMode" flat label="удалить" color="yellow" @click="deleteClient" />
+          <q-btn v-if="!editClientMode" flat label="удалить" color="yellow" @click="handleDelete" />
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <DeleteConfirmPage ref="confirmDialog"
+                       message="удаляем клиента"
+                       :onConfirm="deleteClient"
+    />
+
   </div>
 
 </template>
