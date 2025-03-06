@@ -4,28 +4,38 @@ import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
 import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
 import NewClientDialogPage from "pages/dialogs/NewClientDialogPage.vue";
+import NewServiceDialogPage from "pages/dialogs/NewServiceDialogPage.vue";
 
 const newClientDialog = ref(null)
+const newServiceDialog = ref(null)
 const confirmDialog = ref(null)
 const specializationStore = useSpecializationsStore()
 
 const tab = ref('services')
 
 const editClientMode = ref(false)
+const editServiceMode = ref(false)
 
 const clients = ref([])
+const services = ref([])
+const serviceCategories = ref([])
 const selectedClient = ref(null)
+const selectedService = ref(null)
+const selectedServiceCategory = ref(null)
 
 const selectedSpecializationId = specializationStore.getSelectedSpecialization.id
 
-const showClientsDetails= ref(false)
+const showClientsDetails = ref(false)
+const showServiceDetails = ref(false)
 
 onMounted(() => {
   getClients()
+  getServiceCategories()
+  getServicesByCategory()
 })
 
 function handleDelete(){
-  confirmDialog.value.open()
+  //confirmDialog.value.open()
 }
 
 const getClients = async () => {
@@ -38,9 +48,40 @@ const getClients = async () => {
   }
 }
 
+const getServiceCategories = async () => {
+  const specializationStore = useSpecializationsStore()
+  try {
+    const specializationId = specializationStore.getSelectedSpecialization.id
+    console.log('специализация: ', specializationId)
+    const response = await api.get(`/get_categories/${specializationId}`)
+    serviceCategories.value = response.data
+    console.log('сервис категории: ', serviceCategories.value)
+  } catch (err) {
+    console.error('ошибка загрузки сервис категорий', err)
+  }
+}
+
+const getServicesByCategory = async (categoryId) => {
+  console.log('подгружаем сервисы категории: ', categoryId)
+  console.log('selectedServiceCategory: ', selectedServiceCategory.value)
+  try {
+    const response = await api.get(`/get_service/${categoryId}`)
+    services.value = response.data
+    console.log('подгружены сервисы категории: ', services.value)
+  } catch (err) {
+    console.error('ошибка загрузке сервисов данной категории: ', categoryId , err )
+  }
+}
+
 const openClientDialog = (client) => {
   selectedClient.value = {...client}
   showClientsDetails.value = true
+}
+
+const openServiceDialog = (service) => {
+  console.log('selectedService: ', selectedService.value)
+  selectedService.value = {...service}
+  showServiceDetails.value = true
 }
 
 const editClient = async () => {
@@ -60,6 +101,25 @@ const editClient = async () => {
   }
 }
 
+const editService = async () => {
+  try {
+    console.log('отправление запроса на редактирование')
+    console.log('selectedService',selectedService.value)
+    const response = await api.post(`/edit_service`, {
+      id: selectedService.value.id,
+      service: selectedService.value.service,
+      price: selectedService.value.price
+    })
+    console.log('response: ', response)
+    console.log('selectedServiceCategory', selectedServiceCategory.value)
+    await getServicesByCategory(selectedServiceCategory.value)
+    editServiceMode.value = false
+    showServiceDetails.value = false
+  } catch (err){
+    console.error(err)
+  }
+}
+
 const deleteClient = async () => {
   try {
     const response = await api.post(`/delete_client`, {
@@ -74,14 +134,36 @@ const deleteClient = async () => {
   }
 }
 
+// const deleteService = async () => {
+//   try {
+//     const response = await api.post(`/delete_client`, {
+//       serviceId: selectedService.value.id
+//     })
+//     console.log('response', response)
+//     await getServicesByCategory()
+//     editServiceMode.value = false
+//     showServiceDetails.value = false
+//   } catch (err){
+//     console.error(err)
+//   }
+// }
+
 const openNewClientDialog = () => {
   newClientDialog.value.open()
+}
+
+const openNewServiceDialog = () => {
+  newServiceDialog.value.open()
 }
 
 const handleClientAdded = (newClientData) => {
   clients.value.push(newClientData.client)
   console.log('newClientData', newClientData.client)
   console.log('clients', clients.value)
+}
+
+const handleServiceAdded = (newServiceData) => {
+  services.value.push(newServiceData.service)
 }
 
 </script>
@@ -106,8 +188,66 @@ const handleClientAdded = (newClientData) => {
 
       <q-tab-panels v-model="tab" animated>
 
-        <q-tab-panel name="services">
-          сервисы
+          <!-- отображение списка сервисов -->
+          <!-- панель выбора сервисов -->
+          <q-tab-panel name="services" style="padding: 0">
+            <q-select v-model="selectedServiceCategory"
+                      :options="serviceCategories"
+                      option-label="category_name"
+                      option-value="id"
+                      emit-value
+                      map-options
+                      label="категории работ"
+                      dense
+                      placeholder="нет категорий"
+                      label-color="grey"
+                      color="yellow"
+                      @update:model-value="getServicesByCategory"
+            />
+
+            <q-list bordered separator >
+              <q-item-label v-if="!services">Нет сервисов</q-item-label>
+              <q-item v-for="service in services"
+                      :key="service"
+                      class="w-100 justify-between selectService"
+                      style="width: 100%"
+                      clickable
+                      v-ripple
+                      @click="openServiceDialog(service)"
+                      :q-item
+              >
+
+                <q-item-section >
+                  <q-item-label class="text-left">
+                    {{ service.service }}
+                  </q-item-label>
+                </q-item-section>
+
+                <q-item-section >
+                  <q-item-label class="text-right">
+                    {{ service.price }}
+                  </q-item-label>
+                </q-item-section>
+
+                <q-btn
+                  icon="add"
+                  round
+                  class="fab bg-yellow text-black"
+                  @click="console.log('не реализовано')"
+                  size="20px"
+                />
+
+              </q-item>
+            </q-list>
+
+          <!-- Плавающая кнопка добавления нового сервиса -->
+          <q-btn
+            icon="add"
+            round
+            class="fab bg-yellow text-black"
+            @click="openNewServiceDialog"
+            size="20px"
+          />
         </q-tab-panel>
 
         <q-tab-panel name="clients" style="padding: 0">
@@ -191,12 +331,45 @@ const handleClientAdded = (newClientData) => {
 
     </q-dialog>
 
+    <q-dialog v-model="showServiceDetails" persistent>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">сервис</div>
+          <q-input :disable="!editServiceMode"
+                   v-model="selectedService.service"
+                   label-color="yellow"
+                   color="yellow"
+                   label="название сервиса"
+                   outlined
+                   class="q-mb-md"
+          />
+          <q-input :disable="!editServiceMode"
+                   v-model="selectedService.price"
+                   label-color="yellow"
+                   color="yellow"
+                   label="цена"
+                   outlined class="q-mb-md"
+          />
+
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn v-if="editServiceMode" flat label="отмена" color="yellow" @click="editServiceMode = false" />
+          <q-btn v-if="!editServiceMode" flat label="закрыть" color="yellow" @click="showServiceDetails = false" />
+          <q-btn v-if="!editServiceMode" flat label="редактировать" color="yellow" @click="editServiceMode = true" />
+          <q-btn v-if="editServiceMode" flat label="сохранить" color="yellow" @click="editService" />
+          <q-btn v-if="!editServiceMode" flat label="удалить" color="yellow" @click="console.log('не реализовано')" />
+        </q-card-actions>
+      </q-card>
+
+    </q-dialog>
+
     <DeleteConfirmPage ref="confirmDialog"
                        message="удаляем клиента"
                        :onConfirm="deleteClient"
     />
 
     <NewClientDialogPage ref="newClientDialog" @client-added="handleClientAdded" />
+    <NewServiceDialogPage ref="newServiceDialog" @service-added="handleServiceAdded" :data="selectedServiceCategory" />
 
   </div>
 
