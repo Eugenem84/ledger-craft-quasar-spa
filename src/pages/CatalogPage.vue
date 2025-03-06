@@ -100,7 +100,7 @@ const deleteClient = async () => {
 
         <q-tab-panel name="clients" style="padding: 0">
 
-          <!-- отображение списка продуктов -->
+          <!-- отображение списка клиентов -->
           <q-list bordered separator >
 
             <q-item-label v-if="!clients">Нет материалов</q-item-label>
@@ -126,7 +126,18 @@ const deleteClient = async () => {
               </q-item-section>
 
             </q-item>
+
           </q-list>
+
+          <!-- Плавающая кнопка добавления нового клиента -->
+          <q-btn
+            icon="add"
+            round
+            class="fab bg-yellow text-black"
+            @click="console.log('не реализовано')"
+            size="20px"
+          />
+
         </q-tab-panel>
 
       </q-tab-panels>
@@ -165,6 +176,7 @@ const deleteClient = async () => {
           <q-btn v-if="!editClientMode" flat label="удалить" color="yellow" @click="handleDelete" />
         </q-card-actions>
       </q-card>
+
     </q-dialog>
 
     <DeleteConfirmPage ref="confirmDialog"
@@ -183,6 +195,13 @@ const deleteClient = async () => {
   top: 0;
   z-index: 1;
   background-color: black;
+}
+
+.fab {
+  position: fixed;
+  bottom: 70px;
+  right: 16px;
+  z-index: 1000; /* чтобы кнопка была поверх остальных элементов */
 }
 
 </style>
