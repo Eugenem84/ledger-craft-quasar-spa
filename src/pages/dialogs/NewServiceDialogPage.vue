@@ -31,17 +31,18 @@ defineExpose({open})
 
 const addNew = async () => {
   try {
+    console.log('category_id: ', props.data)
     const response = await api.post('/add_service', {
       service: name.value,
       price: price.value,
-      categoryId: categoryId.value,
+      category_id: props.data,
       specialization_id: selectedSpecializationId
     })
     name.value = ''
     price.value = ''
     categoryId.value = ''
     close()
-    emit('client-added', response.data)
+    emit('service-added', response.data)
     console.log('response', response)
   } catch (err) {
     console.error('ошибка добавления сервиса: ', err)
@@ -55,13 +56,13 @@ const addNew = async () => {
   <q-dialog v-model="isOpen">
     <q-card>
       <q-card-section>
-        <div class="text-h6"> новый клиент</div>
+        <div class="text-h6"> новый сервис</div>
         <q-input v-model="name" label="Название сервиса" outlined class="q-mb-md" />
         <q-input v-model="price" label="цена" outlined class="q-mb-md" />
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="отмена" color="yellow" @click="close" />
-        <q-btn flat label="сохранить" color="green" @click="addNew" />
+        <q-btn flat label="сохранить" color="yellow" @click="addNew" />
       </q-card-actions>
     </q-card>
   </q-dialog>

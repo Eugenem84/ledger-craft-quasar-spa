@@ -52,7 +52,7 @@ const addNew = async () => {
       </q-card-section>
       <q-card-actions align="right">
         <q-btn flat label="отмена" color="yellow" @click="close" />
-        <q-btn flat label="сохранить" color="creen" @click="addNew" />
+        <q-btn flat label="сохранить" color="yellow" @click="addNew" />
       </q-card-actions>
     </q-card>
   </q-dialog>
