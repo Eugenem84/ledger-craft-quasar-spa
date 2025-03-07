@@ -56,12 +56,12 @@ const openEditProductCategoryDialog = () => {
 
 const openAddProductDialog = () => {
   selectedProduct.value = null
-  productDialog.value.open()
+  productDialog.value.open(null, selectedProductCategory.value, false)
 }
 
-const openEditProductDialog = (product) => {
+const openDetailProductDialog = (product) => {
   selectedProduct.value = product
-  productDialog.value.open(product)
+  productDialog.value.open(product, null, true)
 }
 
 const handleProductCategorySaved = () => {
@@ -110,21 +110,28 @@ const handleProductAdded = () => {
           style="width: 100%"
           clickable
           v-ripple
-          @click="openEditProductDialog"
+          @click="openDetailProductDialog(product)"
           :q-item
   >
-    <q-item-section class="col-auto">
+    <q-item-section class="col-8">
       <q-item-label class="text-left">
         {{ product.name }}
       </q-item-label>
     </q-item-section>
 
 
-    <q-item-section class="col-auto">
-      <q-item-label class="text-right">
+    <q-item-section class="col-1">
+      <q-item-label class="text-center">
         {{ product.quantity }}
       </q-item-label>
     </q-item-section>
+
+    <q-item-section class="col-2">
+      <q-item-label class="text-right">
+        {{product.base_sale_price}}
+      </q-item-label>
+    </q-item-section>
+
   </q-item>
 
 </q-list>

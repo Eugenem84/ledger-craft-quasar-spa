@@ -8,7 +8,7 @@ const deleteConfirmPage = ref(null)
 
 const specializationStore = useSpecializationsStore()
 
-const emit = defineEmits(['product-category-saved'])
+const emit = defineEmits(['product-saved'])
 
 const currentCategory = ref(null)
 
@@ -18,9 +18,9 @@ const name = ref(null)
 
 const editMode = computed(() => !!currentCategory.value)
 
-const open = (categoty) => {
-  currentCategory.value = categoty ? {...categoty} : null
-  name.value = categoty?.name || ''
+const open = (category) => {
+  currentCategory.value = category ? {...category} : null
+  name.value = category?.name || ''
   showDialog.value = true
 }
 
@@ -28,7 +28,7 @@ const saveProductCategory = async () => {
   try {
     //console.log('currentCategoryId: ', currentCategory.value.id)
     if (editMode.value){
-      console.log('редактируем категорию')
+      console.log('редактирование продукта не реализовано')
       await api.post(`/edit_product_category`, {
         id: currentCategory.value.id,
         name: name.value,
@@ -37,7 +37,7 @@ const saveProductCategory = async () => {
       showDialog.value = false
       emit('product-category-saved')
     } else {
-      console.log('создаем новую категорию')
+      console.log('создаем новый продукт')
       await api.post(`/add_product_category`, {
         name: name.value,
         specialization_id: specializationStore.getSelectedSpecialization.id
