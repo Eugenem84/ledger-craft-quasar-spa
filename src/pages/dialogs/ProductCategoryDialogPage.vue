@@ -1,20 +1,14 @@
 <script setup>
 import {ref, computed} from 'vue'
 import {api} from 'boot/axios.js'
-//import {useQuasar} from "quasar";
 import {useSpecializationsStore} from "stores/specializations.js";
+import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
+
+const deleteConfirmPage = ref(null)
 
 const specializationStore = useSpecializationsStore()
-//const $q = useQuasar()
 
-const props = defineProps({
-  // category: {
-  //   type: Object,
-  //   default: null
-  // }
-})
-
-//const emit = defineEmits(['product-category-saved'])
+const emit = defineEmits(['product-category-saved'])
 
 const currentCategory = ref(null)
 
@@ -32,26 +26,52 @@ const open = (categoty) => {
 
 const saveProductCategory = async () => {
   try {
-    console.log('specializationId: ', specializationStore.getSelectedSpecialization.id)
+    //console.log('currentCategoryId: ', currentCategory.value.id)
     if (editMode.value){
+      console.log('редактируем категорию')
       await api.post(`/edit_product_category`, {
-        id: props.category.id,
+        id: currentCategory.value.id,
         name: name.value,
         specialization_id: specializationStore.getSelectedSpecialization.id
       })
-      close()
+      showDialog.value = false
+      emit('product-category-saved')
     } else {
+      console.log('создаем новую категорию')
       await api.post(`/add_product_category`, {
         name: name.value,
         specialization_id: specializationStore.getSelectedSpecialization.id
       })
-      close()
+      showDialog.value = false
+      emit('product-category-saved')
     }
   } catch (err){
     console.error(err)
+    currentCategory.value = null
     close()
   }
 }
+
+const deleteCategory = async () => {
+  if (!currentCategory.value) return
+
+  // Показываем диалог подтверждения
+  deleteConfirmPage.value.open(
+    'Подтвердите удаление',
+    `Вы уверены, что хотите удалить категорию "${currentCategory.value.name}"?`,
+    async () => {
+      try {
+        await api.post(`/delete_product_category`, {
+          productCategoryId: currentCategory.value.id
+        });
+        emit('product-category-saved'); // Обновляем список
+        showDialog.value = false; // Закрываем диалог редактирования
+      } catch (err) {
+        console.error("Ошибка удаления категории", err);
+      }
+    }
+  );
+};
 
 defineExpose({open})
 
@@ -62,7 +82,6 @@ defineExpose({open})
   <q-dialog v-model="showDialog" persistent>
     <q-card style="min-width: 400px">
       <q-card-section class="row items-center">
-        <q-avatar icon="category" color="yellow" text-color="white" />
         <span class="q-ml-sm text-h6">
           {{ editMode ? 'Редактирование' : 'Новая категория'}}
         </span>
@@ -90,8 +109,15 @@ defineExpose({open})
         />
 
         <q-btn label="Сохранить"
-               color="yellow"
+               text-color="yellow"
                @click="saveProductCategory"
+        />
+
+        <q-btn label="Удалить"
+               flat
+               color="yellow"
+               @click="deleteCategory"
+               v-if="currentCategory"
         />
 
       </q-card-actions>
@@ -99,6 +125,8 @@ defineExpose({open})
 
     </q-card>
   </q-dialog>
+
+  <DeleteConfirmPage ref="deleteConfirmPage" />
 
 </template>
 

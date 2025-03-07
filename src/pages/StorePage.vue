@@ -64,7 +64,7 @@ const openEditProductDialog = (product) => {
   productDialog.value.open(product)
 }
 
-const handleProductCategoryAdded = () => {
+const handleProductCategorySaved = () => {
   getProductCategories()
   selectedProductCategory.value = null
 }
@@ -138,7 +138,7 @@ const handleProductAdded = () => {
 />
 
 <ProductDialogPage ref="productDialog"  @product-added="handleProductAdded" />
-<ProductCategoryDialogPage ref="productCategoryDialog" @product-category-added="handleProductCategoryAdded"  />
+<ProductCategoryDialogPage ref="productCategoryDialog" @product-category-saved="handleProductCategorySaved"  />
 
 </template>
 
