@@ -6,10 +6,13 @@ import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
 import NewClientDialogPage from "pages/dialogs/NewClientDialogPage.vue";
 import NewServiceDialogPage from "pages/dialogs/NewServiceDialogPage.vue";
 import NewServiceCategoryDialogPage from "pages/dialogs/NewServiceCategoryDialogPage.vue";
+import EditServiceCategoryDialogPage from "pages/dialogs/EditServiceCategoryDialogPage.vue";
 
 const newClientDialog = ref(null)
 const newServiceDialog = ref(null)
 const newServiceCategoryDialog = ref(null)
+const editServiceCategoryDialog = ref(null)
+
 const confirmDialog = ref(null)
 const specializationStore = useSpecializationsStore()
 
@@ -79,7 +82,7 @@ const getServicesByCategory = async (categoryId) => {
   console.log('подгружаем сервисы категории: ', categoryId)
   console.log('selectedServiceCategory: ', selectedServiceCategory.value)
   try {
-    const response = await api.get(`/get_service/${selectedServiceCategory.value}`)
+    const response = await api.get(`/get_service/${selectedServiceCategory.value.id}`)
     services.value = response.data
     console.log('подгружены сервисы категории: ', services.value)
   } catch (err) {
@@ -174,6 +177,10 @@ const openNewServiceCategoryDialog = () => {
   newServiceCategoryDialog.value.open()
 }
 
+const openEditServiceCategoryDialog = () => {
+  editServiceCategoryDialog.value.open()
+}
+
 const handleClientAdded = (newClientData) => {
   clients.value.push(newClientData.client)
   console.log('newClientData', newClientData.client)
@@ -186,6 +193,12 @@ const handleServiceAdded = () => {
 }
 
 const handleServiceCategoryAdded = () => {
+  getServiceCategories()
+}
+
+const handleServiceCategoryEdited = () => {
+  serviceCategories.value = null
+  selectedServiceCategory.value = null
   getServiceCategories()
 }
 
@@ -218,7 +231,6 @@ const handleServiceCategoryAdded = () => {
             <q-select v-model="selectedServiceCategory"
                       :options="serviceCategories"
                       option-label="category_name"
-                      option-value="id"
                       emit-value
                       map-options
                       label="категории работ"
@@ -226,12 +238,15 @@ const handleServiceCategoryAdded = () => {
                       placeholder="нет категорий"
                       label-color="grey"
                       color="yellow"
-                      class="col-10"
+                      class="col-9"
                       @update:model-value="getServicesByCategory"
               />
 
               <div class="col-auto self-end">
-              <q-btn class="col-auto text-yellow" @click="openNewServiceCategoryDialog">+</q-btn>
+                <q-btn class="col-1 text-yellow" @click="openNewServiceCategoryDialog">+</q-btn>
+              </div>
+              <div class="col-auto self-end">
+                <q-btn class="col-1 text-yellow" icon="edit" @click="openEditServiceCategoryDialog" />
               </div>
 
             </div>
@@ -399,7 +414,10 @@ const handleServiceCategoryAdded = () => {
     <NewClientDialogPage ref="newClientDialog" @client-added="handleClientAdded" />
     <NewServiceDialogPage ref="newServiceDialog" @service-added="handleServiceAdded" :data="selectedServiceCategory" />
     <NewServiceCategoryDialogPage ref="newServiceCategoryDialog" @service_category-added="handleServiceCategoryAdded" />
-
+    <EditServiceCategoryDialogPage ref="editServiceCategoryDialog"
+                                   @service_category-edited="handleServiceCategoryEdited"
+                                   :data="selectedServiceCategory"
+    />
   </div>
 
 </template>
