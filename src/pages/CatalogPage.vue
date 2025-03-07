@@ -249,7 +249,7 @@ const handleServiceCategoryEdited = () => {
                 <q-btn class="col-1 text-yellow" icon="edit" @click="openEditServiceCategoryDialog" />
               </div>
 
-            </div>
+          </div>
 
             <q-list bordered separator >
               <q-item-label v-if="!services">Нет сервисов</q-item-label>
