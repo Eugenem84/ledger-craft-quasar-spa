@@ -5,9 +5,11 @@ import {useSpecializationsStore} from "stores/specializations.js";
 import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
 import NewClientDialogPage from "pages/dialogs/NewClientDialogPage.vue";
 import NewServiceDialogPage from "pages/dialogs/NewServiceDialogPage.vue";
+import NewServiceCategoryDialogPage from "pages/dialogs/NewServiceCategoryDialogPage.vue";
 
 const newClientDialog = ref(null)
 const newServiceDialog = ref(null)
+const newServiceCategoryDialog = ref(null)
 const confirmDialog = ref(null)
 const specializationStore = useSpecializationsStore()
 
@@ -168,6 +170,10 @@ const openNewServiceDialog = () => {
   newServiceDialog.value.open()
 }
 
+const openNewServiceCategoryDialog = () => {
+  newServiceCategoryDialog.value.open()
+}
+
 const handleClientAdded = (newClientData) => {
   clients.value.push(newClientData.client)
   console.log('newClientData', newClientData.client)
@@ -177,6 +183,10 @@ const handleClientAdded = (newClientData) => {
 const handleServiceAdded = () => {
   getServicesByCategory()
   console.log('services: ', services)
+}
+
+const handleServiceCategoryAdded = () => {
+  getServiceCategories()
 }
 
 </script>
@@ -201,9 +211,10 @@ const handleServiceAdded = () => {
 
       <q-tab-panels v-model="tab" animated>
 
-          <!-- отображение списка сервисов -->
-          <!-- панель выбора сервисов -->
-          <q-tab-panel name="services" style="padding: 0">
+        <q-tab-panel name="services" style="padding: 0">
+
+          <div class="row items-center" >
+
             <q-select v-model="selectedServiceCategory"
                       :options="serviceCategories"
                       option-label="category_name"
@@ -215,8 +226,15 @@ const handleServiceAdded = () => {
                       placeholder="нет категорий"
                       label-color="grey"
                       color="yellow"
+                      class="col-10"
                       @update:model-value="getServicesByCategory"
-            />
+              />
+
+              <div class="col-auto self-end">
+              <q-btn class="col-auto text-yellow" @click="openNewServiceCategoryDialog">+</q-btn>
+              </div>
+
+            </div>
 
             <q-list bordered separator >
               <q-item-label v-if="!services">Нет сервисов</q-item-label>
@@ -380,6 +398,7 @@ const handleServiceAdded = () => {
 
     <NewClientDialogPage ref="newClientDialog" @client-added="handleClientAdded" />
     <NewServiceDialogPage ref="newServiceDialog" @service-added="handleServiceAdded" :data="selectedServiceCategory" />
+    <NewServiceCategoryDialogPage ref="newServiceCategoryDialog" @service_category-added="handleServiceCategoryAdded" />
 
   </div>
 
