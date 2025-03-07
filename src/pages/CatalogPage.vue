@@ -174,10 +174,10 @@ const handleClientAdded = (newClientData) => {
   console.log('clients', clients.value)
 }
 
-// const handleServiceAdded = (newServiceData) => {
-//   services.value.push(newServiceData.service)
-//   console.log('services: ', services)
-// }
+const handleServiceAdded = () => {
+  getServicesByCategory()
+  console.log('services: ', services)
+}
 
 </script>
 
@@ -379,7 +379,7 @@ const handleClientAdded = (newClientData) => {
     <DeleteConfirmPage ref="confirmDialog"/>
 
     <NewClientDialogPage ref="newClientDialog" @client-added="handleClientAdded" />
-    <NewServiceDialogPage ref="newServiceDialog" @client-added="console.log('emit не реализован')" :data="selectedServiceCategory" />
+    <NewServiceDialogPage ref="newServiceDialog" @service-added="handleServiceAdded" :data="selectedServiceCategory" />
 
   </div>
 
