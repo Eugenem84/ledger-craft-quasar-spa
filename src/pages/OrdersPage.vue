@@ -38,14 +38,14 @@ const getOrders = async () => {
     console.log('запрашиваем ордеры специализации: ', id)
     const token = localStorage.getItem('authToken')
     console.log('token: ', token)
-    const response = await api.get(`/orders_by_specialization/${id}`, {
+    const response = await api.get(`/get_orders_by_user`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
     //authStore.setToken(response.data.access_token)
     orders.value = response.data
-    console.log(response.data)
+    console.log('ордеры: ', response.data)
   } catch (err) {
     console.error('Ошибка загрузки ордеров: ', err)
   } finally {

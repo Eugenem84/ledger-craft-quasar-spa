@@ -274,6 +274,8 @@ const saveOrder = async () => {
 }
 
 const createOrder = async () => {
+  const token = localStorage.getItem('authToken')
+  console.log('token: ', token)
   console.log('сохроняем новый ордер')
   try {
     const response = await api.post(`/save_order`, {
@@ -289,6 +291,10 @@ const createOrder = async () => {
       userOrderNumber: '',
       status: orderStatus.value,
       materials: ''
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     console.log('response: ', response)
     console.log('переход не реализован')
