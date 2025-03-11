@@ -19,18 +19,20 @@ const showDialog = ref(false)
 const name = ref(null)
 const baseSalePrice = ref(null)
 
-const editMode = ref(true)
+const editMode = ref(false)
 
 const open = (product, productCategory) => {
+  console.log('открытие диалогового продукта')
+  editMode.value = false
   currentProduct.value = product ? {...product} : null
   currentProductCategory.value = productCategory || null
   name.value = product?.name || ''
   baseSalePrice.value = product?.base_sale_price || ''
-  if (currentProductCategory.value){
-    editMode.value = false
-  } else {
-    editMode.value = true
-  }
+  // if (currentProductCategory.value){
+  //   editMode.value = false
+  // } else {
+  //   editMode.value = true
+  // }
   showDialog.value = true
   console.log('product: ', product)
   console.log('productCategory: ', productCategory)
@@ -86,6 +88,10 @@ const deleteCategory = async () => {
   );
 };
 
+const openArrivalProductDialog = () => {
+  console.log('arrival not realized')
+}
+
 defineExpose({open})
 
 </script>
@@ -109,6 +115,7 @@ defineExpose({open})
                    label="название продукта"
                    placeholder="Введите название"
                    class="q-mb-md"
+                   :disable="!editMode"
           />
         </div>
       </q-card-section>
@@ -120,6 +127,7 @@ defineExpose({open})
                    label="цена продажи"
                    placeholder="Введите цену продажи"
                    class="q-mb-md"
+                   :disable="!editMode"
           />
         </div>
       </q-card-section>
@@ -127,21 +135,42 @@ defineExpose({open})
       <q-card-actions align="right">
 
         <q-btn flat
+               v-if="editMode"
                label="Отмена"
+               color="yellow"
+               @click="editMode = false"
+        />
+
+        <q-btn flat
+               v-if="!editMode"
+               label="закрыть"
                color="yellow"
                v-close-popup
         />
 
         <q-btn label="Сохранить"
+               v-if="editMode"
                text-color="yellow"
                @click="saveProduct"
+        />
+
+        <q-btn label="редактировать"
+               v-if="!editMode"
+               text-color="yellow"
+               @click="editMode = true"
         />
 
         <q-btn label="Удалить"
                flat
                color="yellow"
                @click="deleteCategory"
-               v-if="currentProduct"
+               v-if="!editMode"
+        />
+
+        <q-btn label="Поступление"
+               v-if="!editMode"
+               text-color="yellow"
+               @click="openArrivalProductDialog"
         />
 
       </q-card-actions>
