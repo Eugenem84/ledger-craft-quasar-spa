@@ -277,6 +277,7 @@ const createOrder = async () => {
   const token = localStorage.getItem('authToken')
   console.log('token: ', token)
   console.log('сохроняем новый ордер')
+  console.log('services', services.value.map(service => service.id))
   try {
     const response = await api.post(`/save_order`, {
       clientId: client.value.id,
@@ -285,7 +286,7 @@ const createOrder = async () => {
       totalAmount: totalSumProducts.value + totalSumMaterials.value + totalSumServices.value,
       addedMaterials: materials.value,
       addedProducts: products.value,
-      services: services.value,
+      servicesId: services.value.map(service => service.id),
       comments: comments.value,
       paid: paid.value,
       userOrderNumber: '',

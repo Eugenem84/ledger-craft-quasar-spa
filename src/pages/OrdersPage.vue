@@ -54,6 +54,7 @@ const getOrders = async () => {
 }
 
 onMounted(() => {
+  console.log('url: ', api.defaults.baseURL)
   getOrders()
 })
 
