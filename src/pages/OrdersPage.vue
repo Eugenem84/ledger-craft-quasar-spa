@@ -4,6 +4,9 @@ import { useRouter } from "vue-router";
 import { api } from 'boot/axios.js'
 import {useSpecializationsStore} from "stores/specializations.js";
 import {useOrderStore} from "stores/order.js";
+import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
+
+const deleteConfirmPage = ref(null)
 
 const orderStore = useOrderStore()
 const router = useRouter()
@@ -121,6 +124,8 @@ onMounted(() => {
     />
 
   </q-page>
+
+  <DeleteConfirmPage ref="deleteConfirmPage" />
 
 </template>
 

@@ -4,6 +4,9 @@ import {useOrderStore} from "stores/order.js";
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
 import {useRouter} from "vue-router";
+import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
+
+const deleteConfirmPage = ref(null)
 
 import {useQuasar} from "quasar";
 //import {data} from "autoprefixer";
@@ -168,14 +171,37 @@ const getServicesByCategory = async (categoryId) => {
 }
 
 const deleteOrder = async () => {
-  console.log('удаляем ордер ', order.value.id)
-  try {
-    const response = await api.delete(`/delete_order/${order.value.id}`)
-    console.log('ордер удален' , response)
-    router.back()
-  } catch (err){
-    console.error('ошибка удаления ордера: ', err)
-  }
+
+  deleteConfirmPage.value.open(
+    'Подтвердите удаление',
+    `Вы уверены, что хотите удалить ордер "${order.value.name}"?`,
+    async () => {
+      try {
+        const response = await api.delete(`/delete_order/${order.value.id}`)
+        if (response.status === 200) {
+          $q.notify({
+            type: 'positive',
+            message: `ордер ${order.value.id} удален`,
+            position: 'top',
+            timeout: 500
+          })
+        }
+      } catch (err) {
+        console.error("Ошибка удаления ордера", err);
+      } finally {
+        router.back()
+      }
+    }
+  );
+
+  // console.log('удаляем ордер ', order.value.id)
+  // try {
+  //   const response = await api.delete(`/delete_order/${order.value.id}`)
+  //   console.log('ордер удален' , response)
+  //   router.back()
+  // } catch (err){
+  //   console.error('ошибка удаления ордера: ', err)
+  // }
 }
 
 onMounted(() => {
@@ -1001,6 +1027,8 @@ const addProductFromStore = () => {
       </q-card>
     </q-dialog>
   </div>
+
+  <DeleteConfirmPage ref="deleteConfirmPage" />
 
 </template>
 

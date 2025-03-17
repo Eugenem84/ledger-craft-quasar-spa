@@ -1,9 +1,9 @@
 <script setup>
 import {ref} from 'vue'
 import {api} from 'boot/axios.js'
-//import {useSpecializationsStore} from "stores/specializations.js";
+import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
 
-//const specializationStore = useSpecializationsStore()
+const deleteConfirmPage = ref(null)
 
 const emit = defineEmits(['product-arrival-saved'])
 
@@ -117,6 +117,8 @@ defineExpose({open})
 
     </q-card>
   </q-dialog>
+
+  <DeleteConfirmPage ref="deleteConfirmPage" />
 
 </template>
 
