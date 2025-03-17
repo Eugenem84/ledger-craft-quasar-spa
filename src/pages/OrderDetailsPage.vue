@@ -167,6 +167,17 @@ const getServicesByCategory = async (categoryId) => {
   }
 }
 
+const deleteOrder = async () => {
+  console.log('удаляем ордер ', order.value.id)
+  try {
+    const response = await api.delete(`/delete_order/${order.value.id}`)
+    console.log('ордер удален' , response)
+    router.back()
+  } catch (err){
+    console.error('ошибка удаления ордера: ', err)
+  }
+}
+
 onMounted(() => {
   if(orderStore.currentOrder){
     order.value = orderStore.currentOrder
@@ -489,7 +500,7 @@ const addProductFromStore = () => {
              color="yellow"
              class="justify-end"
              icon="delete_forever"
-             @click="console.log('удаление не реализовано')"
+             @click="deleteOrder"
       />
 
       <q-btn flat
