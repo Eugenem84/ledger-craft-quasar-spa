@@ -462,13 +462,13 @@ const addProductFromStore = () => {
 
 <template>
 
-  <div class="row justify-between items-center no-wrap">
+  <div class="row justify-between">
     <q-btn flat
            v-if="!editMode"
            color="yellow"
            label="НАЗАД"
            @click="$router.back()"
-           size="sm"
+           size="md"
            class="btn-flex"
     />
 
@@ -477,49 +477,66 @@ const addProductFromStore = () => {
            color="yellow"
            label="отмена"
            @click="$router.back()"
-           size="sm"
+           size="md"
            class="btn-flex"
     />
 
-    <q-btn-toggle
-      v-model="orderStatus"
-      size="sm"
-      outline
-      glossy
-      :toggle-color="computedToggleColor"
-      color="grey"
-      @update:model-value="updateOrderStatus"
-      :options="[
+    <div>
+
+      <q-btn flat
+             v-if="!editMode"
+             size="md"
+             color="yellow"
+             class="justify-end"
+             icon="delete_forever"
+             @click="console.log('удаление не реализовано')"
+      />
+
+      <q-btn flat
+             v-if="!editMode"
+             size="md"
+             color="yellow"
+             label="РЕД"
+             @click="activeEditMode"
+      />
+      <q-btn flat
+             v-if="editMode"
+             size="md"
+             color="yellow"
+             label="сохр"
+             @click="saveOrder"
+      />
+
+    </div>
+
+    <div class="items-center row q-gutter-x-md">
+
+      <q-btn-toggle
+        v-model="orderStatus"
+        size="md"
+        outline
+        glossy
+        :toggle-color="computedToggleColor"
+        color="grey"
+        @update:model-value="updateOrderStatus"
+        :options="[
     { label: 'ожид', value: 'waiting' },
     { label: 'враб', value: 'process' },
     { label: 'готово', value: 'done' }
   ]"
-    >
+      >
+      </q-btn-toggle>
 
-    </q-btn-toggle>
+      <q-btn outline
+             size="md"
+             @click="switсhPaidStatus"
+             :color="paid ? 'green' : 'grey'"
+             glossy
+             label="опл"
+      />
 
-    <q-btn outline
-           size="sm"
-           @click="switсhPaidStatus"
-           :color="paid ? 'green' : 'grey'"
-           glossy
-           label="опл"
-    />
+    </div>
 
-    <q-btn flat
-           v-if="!editMode"
-           size="sm"
-           color="yellow"
-           label="РЕД"
-           @click="activeEditMode"
-    />
-    <q-btn flat
-           v-if="editMode"
-           size="sm"
-           color="yellow"
-           label="сохр"
-           @click="saveOrder"
-    />
   </div>
 
   <div class="row items-center" >
