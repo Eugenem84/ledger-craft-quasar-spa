@@ -174,7 +174,7 @@ const deleteOrder = async () => {
 
   deleteConfirmPage.value.open(
     'Подтвердите удаление',
-    `Вы уверены, что хотите удалить ордер "${order.value.name}"?`,
+    `Вы уверены, что хотите удалить ордер "${order.value.id}"?`,
     async () => {
       try {
         const response = await api.delete(`/delete_order/${order.value.id}`)
