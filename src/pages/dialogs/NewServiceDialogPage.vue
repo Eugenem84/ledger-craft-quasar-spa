@@ -31,11 +31,11 @@ defineExpose({open})
 
 const addNew = async () => {
   try {
-    console.log('category_id: ', props.data)
+    console.log('category_id: ', props.data.id)
     const response = await api.post('/add_service', {
       service: name.value,
       price: price.value,
-      category_id: props.data,
+      category_id: props.data.id,
       specialization_id: selectedSpecializationId
     })
     name.value = ''
@@ -57,7 +57,7 @@ const addNew = async () => {
     <q-card>
       <q-card-section>
         <div class="text-h6"> новый сервис</div>
-        <q-input v-model="name" label="Название сервиса" outlined class="q-mb-md" />
+        <q-input v-model="name" label="Название сервиса" outlined class="q-mb-md"/>
         <q-input v-model="price" label="цена" outlined class="q-mb-md" />
       </q-card-section>
       <q-card-actions align="right">
