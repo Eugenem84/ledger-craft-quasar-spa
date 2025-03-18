@@ -84,7 +84,16 @@ const downloadNewVersion = async () => {
     $q.notify({
       type: 'positive',
       message: 'Файл успешно скачан',
-      position: 'top'
+      position: 'top',
+      actions: [
+        {
+          label: 'Открыть',
+          color: 'white',
+          handler: () => {
+            window.open(url, '_blank'); // Попытка открыть файл в новой вкладке
+          }
+        }
+      ]
     });
 
   } catch (err) {

@@ -438,7 +438,7 @@ const addMaterial = () => {
     materials.value.push(newMaterial.value)
     newMaterial.value = { name: '', price: 0, amount: 0 }
     showAddNewMaterialDialog.value = false
-    console.log('materials: ', materials)
+    console.log('materials: ', materials.value)
   } else {
     console.error('Введите корректные данные')
   }
@@ -485,6 +485,11 @@ const addProductFromStore = () => {
   products.value.push(product)
   console.log('products: ', products.value)
   showAddProductFromStoreDialog.value = false
+}
+
+const deleteMaterialFromOrder = (index) => {
+  console.log('index: ', index)
+  materials.value.splice(index, 1)
 }
 
 </script>
@@ -666,8 +671,8 @@ const addProductFromStore = () => {
             <q-list bordered separator >
 
               <q-item-label v-if="!materials">Нет материалов</q-item-label>
-              <q-item v-for="material in materials"
-                      :key="material"
+              <q-item v-for="(material, index) in materials"
+                      :key="material.id"
                       class="w-100 justify-between row"
                       style="width: 100%"
               >
@@ -677,7 +682,6 @@ const addProductFromStore = () => {
                     {{ material.name }}
                   </q-item-label>
                 </q-item-section>
-
 
                 <q-item-section class="col-1">
                   <q-item-label class="text-right">
@@ -698,7 +702,7 @@ const addProductFromStore = () => {
                 </q-item-section>
 
                 <q-item-section class="col-auto" v-if="editMode">
-                  <q-btn icon="delete_forever" @click="materials.splice(index, 1)" color="red" flat round />
+                  <q-btn icon="delete_forever" @click="deleteMaterialFromOrder(index)" color="red" flat round />
                 </q-item-section>
 
               </q-item>
