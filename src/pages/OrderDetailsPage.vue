@@ -193,15 +193,6 @@ const deleteOrder = async () => {
       }
     }
   );
-
-  // console.log('удаляем ордер ', order.value.id)
-  // try {
-  //   const response = await api.delete(`/delete_order/${order.value.id}`)
-  //   console.log('ордер удален' , response)
-  //   router.back()
-  // } catch (err){
-  //   console.error('ошибка удаления ордера: ', err)
-  // }
 }
 
 onMounted(() => {
@@ -430,6 +421,7 @@ const addNewService = async () => {
       category_id: selectedServiceCategory.value
     })
     console.log('response: ', response)
+    await getServicesByCategory(selectedServiceCategory.value)
     closeDialog()
   } catch (err) {
     console.error('ошибка создание нового сервиса:  ',err)
@@ -957,7 +949,7 @@ const addProductFromStore = () => {
     <q-dialog v-model="showAddNewServiceDialog" persistent>
       <q-card>
         <q-card-section>
-          <div class="text-h6">Добавление материала</div>
+          <div class="text-h6">Добавление сервиса</div>
           <q-input v-model="newService.name" label-color="yellow" color="yellow" label="Название" outlined class="q-mb-md" />
           <q-input v-model.number="newService.price" label="Цена" label-color="yellow" color="yellow" type="number" outlined class="q-mb-md" />
         </q-card-section>
