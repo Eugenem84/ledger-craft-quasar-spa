@@ -164,6 +164,14 @@ export default defineConfig((/* ctx */) => {
     cordova: {
       version: version,
       versionCode: generateVersionCode(version),
+      release: {
+        packageType: 'apk',
+      },
+      android: {
+        buildOptions: {
+         buildType: 'apk'
+        }
+      },
       preferences: {
         'InsecureMixedContent': '1'
       }
