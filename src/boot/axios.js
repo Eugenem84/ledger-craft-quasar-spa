@@ -7,7 +7,10 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const api = axios.create({ baseURL: 'https://dev.medovf2h.beget.tech/api/' })
+const api = axios.create({
+ // baseURL: 'https://dev.medovf2h.beget.tech/api/'
+  baseURL: process.env.VITE_API_BASE_URL
+})
 //const api = axios.create({baseURL: 'https://217.114.0.27/api/' })
 
 export default defineBoot(({ app }) => {

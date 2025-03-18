@@ -3,6 +3,14 @@
 
 import { defineConfig } from '#q-app/wrappers'
 
+const { version } = require('./package.json')
+
+function generateVersionCode(version) {
+  // Преобразуем версию, например 1.0.100 -> 100
+  const versionParts = version.split('.').map(part => part.padStart(3, '0')); // добавляем ведущие нули
+  return parseInt(versionParts.slice(-1).join('')); // возвращаем последний компонент как числовой код
+}
+
 export default defineConfig((/* ctx */) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -154,6 +162,8 @@ export default defineConfig((/* ctx */) => {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-cordova-apps/configuring-cordova
     cordova: {
+      version: version,
+      versionCode: generateVersionCode(version),
       preferences: {
         'InsecureMixedContent': '1'
       }
