@@ -306,6 +306,7 @@ const createOrder = async () => {
   console.log('token: ', token)
   console.log('сохроняем новый ордер')
   console.log('services', services.value.map(service => service.id))
+  console.log('addedMaterials: ', materials.value)
   try {
     const response = await api.post(`/save_order`, {
       clientId: client.value.id,

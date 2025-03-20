@@ -46,6 +46,7 @@ const checkAppVersion = async () => {
       newVersionAnable.value = false
     } else {
       newVersion.value = response.data.version
+      newVersionAnable.value = true
     }
   } catch (err) {
     console.error(err)
@@ -56,11 +57,7 @@ const downloadNewVersion = async () => {
   try {
     const response = await api.get('/download-latest-android-apk', {
       responseType: 'blob'
-    })
-    // Создаем ссылку для скачивания
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
+    });
 
     // Извлекаем имя файла из заголовков ответа
     const contentDisposition = response.headers['content-disposition'];
@@ -72,37 +69,78 @@ const downloadNewVersion = async () => {
         .replace(/['"]/g, ''); // Убираем кавычки, если они есть
     }
 
-    link.setAttribute('download', fileName); // Устанавливаем имя файла
-    document.body.appendChild(link);
-    link.click(); // Программно кликаем по ссылке
-    link.remove(); // Удаляем ссылку из DOM
+    // Сохраняем файл на устройство
+    const filePath = cordova.file.externalRootDirectory + fileName;
 
-    // Очищаем объект URL
-    window.URL.revokeObjectURL(url);
+    const writeFile = (fileEntry, dataObj) => {
+      return new Promise((resolve, reject) => {
+        fileEntry.createWriter((fileWriter) => {
+          fileWriter.onwriteend = () => {
+            resolve();
+          };
+          fileWriter.onerror = (e) => {
+            reject(e);
+          };
+          fileWriter.write(dataObj);
+        });
+      });
+    };
 
-    // Уведомление об успешном скачивании
-    $q.notify({
-      type: 'positive',
-      message: 'Файл успешно скачан',
-      position: 'top',
-      actions: [
-        {
-          label: 'Открыть',
-          color: 'white',
-          handler: () => {
-            window.open(url, '_blank'); // Попытка открыть файл в новой вкладке
-          }
-        }
-      ]
+    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, (dirEntry) => {
+      dirEntry.getFile(fileName, { create: true }, (fileEntry) => {
+        writeFile(fileEntry, response.data).then(() => {
+          // Уведомление об успешном скачивании
+          $q.notify({
+            type: 'positive',
+            message: 'Файл успешно скачан',
+            position: 'top',
+            actions: [
+              {
+                label: 'Установить',
+                color: 'white',
+                handler: () => {
+                  // Открываем файл для установки
+                  cordova.plugins.fileOpener2.open(
+                    filePath,
+                    'application/vnd.android.package-archive',
+                    {
+                      error: (e) => {
+                        console.error('Ошибка при открытии файла:', e);
+                        $q.notify({
+                          type: 'negative',
+                          message: 'Ошибка при установке файла',
+                          position: 'top'
+                        });
+                      },
+                      success: () => {
+                        console.log('Файл успешно открыт для установки');
+                      }
+                    }
+                  );
+                }
+              }
+            ]
+          });
+        }).catch((err) => {
+          console.error('Ошибка при записи файла:', err);
+          $q.notify({
+            type: 'negative',
+            message: 'Ошибка при сохранении файла',
+            position: 'top'
+          });
+        });
+      });
     });
 
   } catch (err) {
-    console.error(err)
+    console.error(err);
+    $q.notify({
+      type: 'negative',
+      message: 'Ошибка при загрузке файла',
+      position: 'top'
+    });
   }
-
-
-
-}
+};
 
 </script>
 
@@ -124,13 +162,13 @@ const downloadNewVersion = async () => {
     <p> Версия приложения: {{version}}</p>
   </div>
 
-  <div>
+  <div v-if="newVersionAnable === true">
     <p> Доступна новая версия {{newVersion}}</p>
     <q-btn @click="downloadNewVersion" >скачать</q-btn>
   </div>
 
   <div v-if="newVersionAnable === false">
-    <p> У вас самая последняя версия </p>
+    <p> У Вас самая последняя версия </p>
   </div>
 
   <div>

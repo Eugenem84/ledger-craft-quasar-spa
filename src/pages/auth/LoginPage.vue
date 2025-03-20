@@ -23,7 +23,8 @@ const login = async () => {
   try {
     $q.notify({
       type: 'positive',
-      message: `trying send URL: ${api.defaults.baseURL} `
+      message: `trying send URL: ${api.defaults.baseURL} `,
+      position: 'top',
     })
     const response = await api.post('/login', {
       email: email.value,
@@ -39,7 +40,7 @@ const login = async () => {
       position: "top",
       timeout: "1000"
     })
-    console.error('ошибка входа: ', err.message)
+    console.error('ошибка входа: ', err)
   } finally {
     loading.value = false
   }
