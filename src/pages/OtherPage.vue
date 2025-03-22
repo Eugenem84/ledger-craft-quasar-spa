@@ -55,97 +55,110 @@ const checkAppVersion = async () => {
 
 const downloadNewVersion = async () => {
   try {
-    const response = await api.get('/download-latest-android-apk', {
-      responseType: 'blob'
-    });
+    $q.notify({ type: 'info', message: 'Проверка разрешений...', position: 'top' });
 
-    // Извлекаем имя файла из заголовков ответа
-    const contentDisposition = response.headers['content-disposition'];
-    let fileName = 'LedgerCraft-latest.apk';
-    if (contentDisposition && contentDisposition.includes('filename=')) {
-      fileName = contentDisposition
-        .split('filename=')[1]
-        .split(';')[0]
-        .replace(/['"]/g, ''); // Убираем кавычки, если они есть
-    }
+    document.addEventListener('deviceready', async function () {
+      // Внутреннее хранилище не требует запроса разрешений
+      $q.notify({ type: 'info', message: 'Разрешение получено, начинаем загрузку APK...', position: 'top' });
 
-    // Сохраняем файл на устройство
-    const filePath = cordova.file.externalRootDirectory + fileName;
+      try {
+        const response = await api.get('/download-apk', { responseType: 'blob' });
 
-    const writeFile = (fileEntry, dataObj) => {
-      return new Promise((resolve, reject) => {
-        fileEntry.createWriter((fileWriter) => {
-          fileWriter.onwriteend = () => {
-            resolve();
-          };
-          fileWriter.onerror = (e) => {
-            reject(e);
-          };
-          fileWriter.write(dataObj);
-        });
-      });
-    };
+        $q.notify({ type: 'info', message: 'Файл загружен, определяем имя...', position: 'top' });
 
-    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, (dirEntry) => {
-      dirEntry.getFile(fileName, { create: true }, (fileEntry) => {
-        writeFile(fileEntry, response.data).then(() => {
-          // Уведомление об успешном скачивании
-          $q.notify({
-            type: 'positive',
-            message: 'Файл успешно скачан',
-            position: 'top',
-            actions: [
-              {
-                label: 'Установить',
-                color: 'white',
-                handler: () => {
-                  // Открываем файл для установки
-                  cordova.plugins.fileOpener2.open(
-                    filePath,
-                    'application/vnd.android.package-archive',
+        let fileName = 'LedgerCraft-latest.apk';
+        const contentDisposition = response.headers['content-disposition'];
+        if (contentDisposition && contentDisposition.includes('filename=')) {
+          fileName = contentDisposition.split('filename=')[1].split(';')[0].replace(/['"]/g, '');
+        }
+
+        $q.notify({ type: 'info', message: `Имя файла: ${fileName}`, position: 'top' });
+
+        // Используем внутреннее хранилище для сохранения файла
+        const filePath = cordova.file.dataDirectory + fileName;
+
+        $q.notify({ type: 'info', message: `Файл будет сохранён по пути: ${filePath}`, position: 'top' });
+
+        const writeFile = (fileEntry, dataObj) => {
+          return new Promise((resolve, reject) => {
+            fileEntry.createWriter((fileWriter) => {
+              fileWriter.onwriteend = () => {
+                $q.notify({ type: 'positive', message: 'Файл успешно записан!', position: 'top' });
+                resolve();
+              };
+              fileWriter.onerror = (e) => {
+                $q.notify({ type: 'negative', message: 'Ошибка при записи файла!', position: 'top' });
+                reject(e);
+              };
+              fileWriter.write(dataObj);
+            });
+          });
+        };
+
+        window.resolveLocalFileSystemURL(cordova.file.dataDirectory, (dirEntry) => {
+          $q.notify({ type: 'info', message: 'Файловая система доступна, создаём файл...', position: 'top' });
+
+          dirEntry.getFile(fileName, { create: true }, (fileEntry) => {
+            writeFile(fileEntry, response.data)
+              .then(() => {
+                $q.notify({
+                  type: 'positive',
+                  message: 'Файл успешно скачан!',
+                  position: 'top',
+                  actions: [
                     {
-                      error: (e) => {
-                        console.error('Ошибка при открытии файла:', e);
-                        $q.notify({
-                          type: 'negative',
-                          message: 'Ошибка при установке файла',
-                          position: 'top'
-                        });
-                      },
-                      success: () => {
-                        console.log('Файл успешно открыт для установки');
+                      label: 'Установить',
+                      color: 'white',
+                      handler: () => {
+                        $q.notify({ type: 'info', message: 'Открываем файл для установки...', position: 'top' });
+
+                        cordova.plugins.fileOpener2.open(
+                          filePath,
+                          'application/vnd.android.package-archive',
+                          {
+                            error: (e) => {
+                              $q.notify({ type: 'negative', message: 'Ошибка при открытии файла!', position: 'top' });
+                              console.error('Ошибка при открытии файла:', e);
+                            },
+                            success: () => {
+                              $q.notify({ type: 'positive', message: 'Файл успешно открыт для установки!', position: 'top' });
+                            }
+                          }
+                        );
                       }
                     }
-                  );
-                }
-              }
-            ]
+                  ]
+                });
+              })
+              .catch((err) => {
+                $q.notify({ type: 'negative', message: 'Ошибка при сохранении файла!', position: 'top' });
+                console.error('Ошибка при записи файла:', err);
+              });
+          }, (err) => {
+            $q.notify({ type: 'negative', message: 'Ошибка при создании файла!', position: 'top' });
+            console.error('Ошибка при создании файла:', err);
           });
-        }).catch((err) => {
-          console.error('Ошибка при записи файла:', err);
-          $q.notify({
-            type: 'negative',
-            message: 'Ошибка при сохранении файла',
-            position: 'top'
-          });
+        }, (err) => {
+          $q.notify({ type: 'negative', message: 'Ошибка доступа к файловой системе!', position: 'top' });
+          console.error('Ошибка доступа к файловой системе:', err);
         });
-      });
-    });
 
+      } catch (error) {
+        $q.notify({ type: 'negative', message: 'Ошибка при загрузке файла!', position: 'top' });
+        console.error(error);
+      }
+    }, false);
   } catch (err) {
+    $q.notify({ type: 'negative', message: 'Общая ошибка!', position: 'top' });
     console.error(err);
-    $q.notify({
-      type: 'negative',
-      message: 'Ошибка при загрузке файла',
-      position: 'top'
-    });
   }
 };
+
 
 </script>
 
 <template>
-  <q-btn class="bg-primary" @click="logout">Logout</q-btn>
+  <q-btn class="bg-primary text-black" color="yellow" @click="logout">Выход из аккаунта</q-btn>
 
   <div>
     <q-select v-model="selectedSpecialization"
