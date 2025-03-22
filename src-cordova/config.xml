@@ -14,6 +14,8 @@
         <edit-config file="AndroidManifest.xml" mode="merge" target="application" xmlns:android="http://schemas.android.com/apk/res/android">
             <android:usesCleartextTraffic>true</android:usesCleartextTraffic>
         </edit-config>
+        <preference name="android-targetSdkVersion" value="34" />
+        <preference name="GradleVersion" value="8.4" />
         <resource-file src="res/xml/network_security_config.xml" target="platforms/android/app/src/main/res/xml/network_security_config.xml" />
     </platform>
 </widget>
