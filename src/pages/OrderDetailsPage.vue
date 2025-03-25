@@ -580,7 +580,6 @@ const deleteMaterialFromOrder = (index) => {
               option-value="id"
               :option-label="client => `${client.name} ${client.phone}`"
               label="клиент"
-              dense
               :disable="!editMode"
               class="col"
               color="yellow"
@@ -597,7 +596,6 @@ const deleteMaterialFromOrder = (index) => {
               label="модель"
               :disable="!editMode"
               class="col"
-              dense
               color="yellow"
     />
 
