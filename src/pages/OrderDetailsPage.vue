@@ -578,7 +578,7 @@ const deleteMaterialFromOrder = (index) => {
     <q-select v-model="client"
               :options="clients"
               option-value="id"
-              option-label="name"
+              :option-label="client => `${client.name} ${client.phone}`"
               label="клиент"
               dense
               :disable="!editMode"
