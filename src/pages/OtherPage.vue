@@ -141,7 +141,7 @@ const downloadApkWithSAF = async () => {
     console.error('Общая ошибка:', error);
     $q.notify({ type: 'negative', message: error.message || 'Ошибка операции', position: 'top' });
   }
-};
+}
 
 
 </script>
