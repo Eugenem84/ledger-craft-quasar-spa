@@ -53,104 +53,93 @@ const checkAppVersion = async () => {
   }
 }
 
-const downloadNewVersion = async () => {
+
+// Функция для преобразования Blob в base64-строку
+const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // reader.result имеет формат "data:[mime];base64,..."
+      const base64data = reader.result.split(',')[1];
+      resolve(base64data);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+const downloadApkWithSAF = async () => {
   try {
-    $q.notify({ type: 'info', message: 'Проверка разрешений...', position: 'top' });
+    $q.notify({ type: 'info', message: 'Выберите папку для сохранения APK...', position: 'top' });
 
-    document.addEventListener('deviceready', async function () {
-      // Внутреннее хранилище не требует запроса разрешений
-      $q.notify({ type: 'info', message: 'Разрешение получено, начинаем загрузку APK...', position: 'top' });
+    // Ожидаем, когда Cordova будет готов
+    await new Promise((resolve, reject) => {
+      document.addEventListener('deviceready', resolve, { once: true });
+      setTimeout(() => reject(new Error('Cordova timeout')), 5000);
+    });
 
-      try {
-        const response = await api.get('/download-apk', { responseType: 'blob' });
+    if (!cordova.plugins || !cordova.plugins.safMediastore) {
+      throw new Error('Плагин SAF не доступен');
+    }
+    console.log('Плагин SAF доступен!');
 
-        $q.notify({ type: 'info', message: 'Файл загружен, определяем имя...', position: 'top' });
+    // Запрашиваем выбор папки через SAF
+    const folderUri = await cordova.plugins.safMediastore.selectFolder('Documents');
+    if (!folderUri) {
+      throw new Error('Папка не выбрана');
+    }
+    console.log('Выбранная папка URI:', folderUri);
 
-        let fileName = 'LedgerCraft-latest.apk';
-        const contentDisposition = response.headers['content-disposition'];
-        if (contentDisposition && contentDisposition.includes('filename=')) {
-          fileName = contentDisposition.split('filename=')[1].split(';')[0].replace(/['"]/g, '');
+    // Загружаем APK с сервера как Blob
+    const response = await api.get('/download-apk', { responseType: 'blob' });
+    console.log('content desp: ', response.headers)
+    if (!response || !response.data) {
+      throw new Error('Ошибка при получении данных APK');
+    }
+
+    //const headers = response.headers.toJSON ? response.headers.toJSON() : response.headers;
+    //const contentDisposition = headers['content-disposition'];
+    console.log('APK загружен, размер:', response.data.size, 'байт');
+
+    // Преобразуем Blob в base64-строку
+    const base64Data = await blobToBase64(response.data);
+    console.log('Base64 длина:', base64Data.length);
+
+    // Если сервер не возвращает имя файла, используем имя по умолчанию
+    let filename = 'LedgerCraft-latest.apk';
+
+    //console.log('Content-Disposition:', contentDisposition);
+
+    // if (contentDisposition) {
+    //   const match = contentDisposition.match(/filename="?([^";]+)"?/);
+    //   if (match && match[1]) {
+    //     filename = match[1];
+    //   }
+    // }
+    console.log('Используемое имя файла:', filename);
+
+    // Выполняем запись файла на главном (UI) потоке через requestAnimationFrame
+    const writeUri = await new Promise((resolve, reject) => {
+      window.requestAnimationFrame(async () => {
+        try {
+          const result = await cordova.plugins.safMediastore.writeFile({
+            data: base64Data,
+            filename: filename,
+            folder: folderUri
+          });
+          resolve(result);
+        } catch (error) {
+          reject(error);
         }
+      });
+    });
 
-        $q.notify({ type: 'info', message: `Имя файла: ${fileName}`, position: 'top' });
+    $q.notify({ type: 'positive', message: `Файл сохранён: ${writeUri}`, position: 'top' });
+    console.log('Файл успешно сохранён:', writeUri);
 
-        // Используем внутреннее хранилище для сохранения файла
-        const filePath = cordova.file.dataDirectory + fileName;
-
-        $q.notify({ type: 'info', message: `Файл будет сохранён по пути: ${filePath}`, position: 'top' });
-
-        const writeFile = (fileEntry, dataObj) => {
-          return new Promise((resolve, reject) => {
-            fileEntry.createWriter((fileWriter) => {
-              fileWriter.onwriteend = () => {
-                $q.notify({ type: 'positive', message: 'Файл успешно записан!', position: 'top' });
-                resolve();
-              };
-              fileWriter.onerror = (e) => {
-                $q.notify({ type: 'negative', message: 'Ошибка при записи файла!', position: 'top' });
-                reject(e);
-              };
-              fileWriter.write(dataObj);
-            });
-          });
-        };
-
-        window.resolveLocalFileSystemURL(cordova.file.dataDirectory, (dirEntry) => {
-          $q.notify({ type: 'info', message: 'Файловая система доступна, создаём файл...', position: 'top' });
-
-          dirEntry.getFile(fileName, { create: true }, (fileEntry) => {
-            writeFile(fileEntry, response.data)
-              .then(() => {
-                $q.notify({
-                  type: 'positive',
-                  message: 'Файл успешно скачан!',
-                  position: 'top',
-                  actions: [
-                    {
-                      label: 'Установить',
-                      color: 'white',
-                      handler: () => {
-                        $q.notify({ type: 'info', message: 'Открываем файл для установки...', position: 'top' });
-
-                        cordova.plugins.fileOpener2.open(
-                          filePath,
-                          'application/vnd.android.package-archive',
-                          {
-                            error: (e) => {
-                              $q.notify({ type: 'negative', message: 'Ошибка при открытии файла!', position: 'top' });
-                              console.error('Ошибка при открытии файла:', e);
-                            },
-                            success: () => {
-                              $q.notify({ type: 'positive', message: 'Файл успешно открыт для установки!', position: 'top' });
-                            }
-                          }
-                        );
-                      }
-                    }
-                  ]
-                });
-              })
-              .catch((err) => {
-                $q.notify({ type: 'negative', message: 'Ошибка при сохранении файла!', position: 'top' });
-                console.error('Ошибка при записи файла:', err);
-              });
-          }, (err) => {
-            $q.notify({ type: 'negative', message: 'Ошибка при создании файла!', position: 'top' });
-            console.error('Ошибка при создании файла:', err);
-          });
-        }, (err) => {
-          $q.notify({ type: 'negative', message: 'Ошибка доступа к файловой системе!', position: 'top' });
-          console.error('Ошибка доступа к файловой системе:', err);
-        });
-
-      } catch (error) {
-        $q.notify({ type: 'negative', message: 'Ошибка при загрузке файла!', position: 'top' });
-        console.error(error);
-      }
-    }, false);
-  } catch (err) {
-    $q.notify({ type: 'negative', message: 'Общая ошибка!', position: 'top' });
-    console.error(err);
+  } catch (error) {
+    console.error('Общая ошибка:', error);
+    $q.notify({ type: 'negative', message: error.message || 'Ошибка операции', position: 'top' });
   }
 };
 
@@ -177,7 +166,7 @@ const downloadNewVersion = async () => {
 
   <div v-if="newVersionAnable === true">
     <p> Доступна новая версия {{newVersion}}</p>
-    <q-btn @click="downloadNewVersion" >скачать</q-btn>
+    <q-btn @click="downloadApkWithSAF" >скачать</q-btn>
   </div>
 
   <div v-if="newVersionAnable === false">
