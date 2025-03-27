@@ -594,53 +594,65 @@ const deleteMaterialFromOrder = (index) => {
 
   </div>
 
-  <div class="row items-center" >
-    <q-select v-model="client"
-              :options="filteredClients"
-              v-if="editMode"
-              option-value="id"
-              :option-label="client => `${client.name}  т.${client.phone}`"
-              label="Клиент"
-              class="col"
-              color="yellow"
-              use-input
-              fill-input
-              hide-selected
-              input-debounce="300"
-              behavior="menu"
-              @filter="filterClients"
-    />
+  <div class="row items-center q-col-gutter-md">
+    <!-- Клиент -->
+    <div class="col">
+      <!-- Режим редактирования -->
+      <q-select v-model="client"
+                :options="filteredClients"
+                v-if="editMode"
+                option-value="id"
+                :option-label="client => `${client.name}  т.${client.phone}`"
+                label="Клиент"
+                color="yellow"
+                use-input
+                fill-input
+                hide-selected
+                input-debounce="300"
+                behavior="menu"
+                @filter="filterClients"
+      />
 
-
-
-    <q-field v-if="!editMode" label="Клиент" stack-label class="col" tabindex="-1" style="pointer-events: none" >
-      <div class="text-subtitle1 text-yellow">{{ client?.name }} {{ client?.phone }}</div>
-    </q-field>
-
-    <div class="col-auto self-end" v-if="editMode">
-      <q-btn class="col-auto text-yellow" @click="showAddNewClientDialog=true">+</q-btn>
+      <!-- Режим просмотра -->
+      <q-field v-if="!editMode" label="Клиент" stack-label tabindex="-1" style="pointer-events: none">
+        <div class="column">
+          <div class="text-subtitle1 text-yellow">{{ client?.name }}</div>
+          <a v-if="client?.phone" :href="'tel:' + client.phone" class="text-yellow text-bold text-body2">
+            {{ client.phone }}
+          </a>
+        </div>
+      </q-field>
     </div>
 
-    <q-select v-model="model"
-              :options="models"
-              v-if="editMode"
-              option-value="id"
-              option-label="name"
-              label="модель"
-              :disable="!editMode"
-              class="col"
-              color="yellow"
-    />
-
-    <q-field v-if="!editMode" label="модель" stack-label class="col" tabindex="-1" style="pointer-events: none">
-      <div class="text-subtitle1 text-yellow">{{ model.name }}</div>
-    </q-field>
-
-    <div class="col-auto self-end" v-if="editMode">
-      <q-btn class="col-auto text-yellow" @click="showAddNewModelDialog=true">+</q-btn>
+    <!-- Кнопка для добавления клиента (если в режиме редактирования) -->
+    <div class="col-auto" v-if="editMode">
+      <q-btn class="text-yellow" @click="showAddNewClientDialog = true">+</q-btn>
     </div>
 
+    <!-- Модель -->
+    <div class="col">
+      <!-- Режим редактирования -->
+      <q-select v-model="model"
+                :options="models"
+                v-if="editMode"
+                option-value="id"
+                option-label="name"
+                label="Модель"
+                color="yellow"
+      />
+
+      <!-- Режим просмотра -->
+      <q-field v-if="!editMode" label="Модель" stack-label tabindex="-1" style="pointer-events: none">
+        <div class="text-subtitle1 text-yellow">{{ model?.name || '—' }}</div>
+      </q-field>
+    </div>
+
+    <!-- Кнопка для добавления модели (если в режиме редактирования) -->
+    <div class="col-auto" v-if="editMode">
+      <q-btn class="text-yellow" @click="showAddNewModelDialog = true">+</q-btn>
+    </div>
   </div>
+
 
   <div>
     <q-card>
