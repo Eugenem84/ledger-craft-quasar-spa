@@ -54,10 +54,11 @@ const saveProduct = async () => {
       await api.post(`/edit_product`, {
         id: currentProduct.value.id,
         name: name.value,
+        base_sale_price: baseSalePrice.value,
         specialization_id: specializationStore.getSelectedSpecialization.id
       })
       showDialog.value = false
-      emit('product-category-saved')
+      emit('product-saved')
     } else {
       console.log('создаем новый продукт: ', currentProduct.value)
       await api.post(`/add_product`, {
