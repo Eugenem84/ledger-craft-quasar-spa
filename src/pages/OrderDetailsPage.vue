@@ -97,7 +97,8 @@ const filterClients = (val, update) => {
 
   update(() => {
     filteredClients.value = clients.value.filter(client =>
-      client.name.toLowerCase().includes(val.toLowerCase())
+      client.name.toLowerCase().includes(val.toLowerCase()) ||
+      client.phone.toString().toLowerCase().includes(val.toLowerCase())
     )
   })
 }
@@ -602,7 +603,7 @@ const deleteMaterialFromOrder = (index) => {
                 :options="filteredClients"
                 v-if="editMode"
                 option-value="id"
-                :option-label="client => `${client.name}  т.${client.phone}`"
+                :option-label="client => `${client.name} ${client.phone}`"
                 label="Клиент"
                 color="yellow"
                 use-input

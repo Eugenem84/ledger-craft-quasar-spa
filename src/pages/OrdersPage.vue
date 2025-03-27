@@ -83,7 +83,7 @@ onMounted(() => {
               <q-item-label class="text-body1 q-pa-none q-ma-none" style="font-size: 16px; align-items: flex-start; margin-bottom: -7px">
                 {{ new Date(order.created_at).toLocaleDateString('ru-RU') }}
               </q-item-label>
-              <q-item-label class="q-ml-sm" style="white-space: nowrap; color: gray">
+              <q-item-label class="q-ml-sm" style="white-space: nowrap; color: limegreen">
                 №: {{order.id}}
               </q-item-label>
             </div>
