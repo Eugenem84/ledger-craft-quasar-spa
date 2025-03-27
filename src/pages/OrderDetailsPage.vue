@@ -43,7 +43,10 @@ const clientId = ref(null)
 const modelId = ref(null)
 const comments = ref(null)
 
-const clients = ref(null)
+const clients = ref([])
+
+const filteredClients = ref([...clients.value])
+
 const models = ref(null)
 
 const model = ref({id: null, name: null})
@@ -83,6 +86,21 @@ const newClient = ref({
 const newModel = ref({
   name: '',
 })
+
+const filterClients = (val, update) => {
+  if (val === '') {
+    update(() => {
+      filteredClients.value = [...clients.value]
+    })
+    return
+  }
+
+  update(() => {
+    filteredClients.value = clients.value.filter(client =>
+      client.name.toLowerCase().includes(val.toLowerCase())
+    )
+  })
+}
 
 const getServices = async () => {
   try {
@@ -202,6 +220,7 @@ onMounted(() => {
     paid.value = order.value.paid
     orderStatus.value = order.value.status
     client.value.name = order.value.client_name
+    client.value.phone = order.value.client_phone
     client.value.id = order.value.client_id
     clientId.value = order.value.client_id
     modelId.value = order.value.model_id
@@ -229,6 +248,7 @@ onMounted(() => {
   getClients()
   getModels()
   getServiceCategories()
+  console.log('client: ', client.value)
 })
 
 const getClients = async () => {
@@ -576,14 +596,26 @@ const deleteMaterialFromOrder = (index) => {
 
   <div class="row items-center" >
     <q-select v-model="client"
-              :options="clients"
+              :options="filteredClients"
+              v-if="editMode"
               option-value="id"
-              :option-label="client => `${client.name} ${client.phone}`"
-              label="клиент"
-              :disable="!editMode"
+              :option-label="client => `${client.name}  т.${client.phone}`"
+              label="Клиент"
               class="col"
               color="yellow"
+              use-input
+              fill-input
+              hide-selected
+              input-debounce="300"
+              behavior="menu"
+              @filter="filterClients"
     />
+
+
+
+    <q-field v-if="!editMode" label="Клиент" stack-label class="col" tabindex="-1" style="pointer-events: none" >
+      <div class="text-subtitle1 text-yellow">{{ client?.name }} {{ client?.phone }}</div>
+    </q-field>
 
     <div class="col-auto self-end" v-if="editMode">
       <q-btn class="col-auto text-yellow" @click="showAddNewClientDialog=true">+</q-btn>
@@ -591,6 +623,7 @@ const deleteMaterialFromOrder = (index) => {
 
     <q-select v-model="model"
               :options="models"
+              v-if="editMode"
               option-value="id"
               option-label="name"
               label="модель"
@@ -598,6 +631,10 @@ const deleteMaterialFromOrder = (index) => {
               class="col"
               color="yellow"
     />
+
+    <q-field v-if="!editMode" label="модель" stack-label class="col" tabindex="-1" style="pointer-events: none">
+      <div class="text-subtitle1 text-yellow">{{ model.name }}</div>
+    </q-field>
 
     <div class="col-auto self-end" v-if="editMode">
       <q-btn class="col-auto text-yellow" @click="showAddNewModelDialog=true">+</q-btn>
@@ -1032,6 +1069,10 @@ const deleteMaterialFromOrder = (index) => {
 .selectService:hover {
   background-color: yellow;
   color: black
+}
+
+.row {
+  background-color: black;
 }
 
 .fab {
