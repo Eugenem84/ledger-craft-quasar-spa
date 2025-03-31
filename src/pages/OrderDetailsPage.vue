@@ -528,6 +528,13 @@ const deleteMaterialFromOrder = (index) => {
            class="btn-flex"
     />
 
+    <div v-if="order">
+      <a style="color:grey; font-size:12px ">№</a>
+      <a style="color: yellow; font-size: 17px; padding-top: 5px; display: inline-block">
+        {{order.id}}
+      </a>
+    </div>
+
     <q-btn flat
            v-if="editMode"
            color="yellow"

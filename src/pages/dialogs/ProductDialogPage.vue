@@ -50,7 +50,7 @@ const saveProduct = async () => {
   try {
     //console.log('currentCategoryId: ', currentCategory.value.id)
     if (editMode.value){
-      console.log('редактирование продукта не реализовано')
+      //console.log('редактирование продукта не реализовано')
       await api.post(`/edit_product`, {
         id: currentProduct.value.id,
         name: name.value,
