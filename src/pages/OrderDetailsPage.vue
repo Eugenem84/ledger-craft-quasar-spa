@@ -863,14 +863,15 @@ const clearOrder = () => {
                     emit-value
                     map-options
                     label="категории работ"
-                    dense
                     placeholder="нет категорий"
                     label-color="grey"
                     color="yellow"
+                    text-color="yellow"
                     @update:model-value="getServicesByCategory"
           />
 
           <q-list bordered separator >
+            <div class="text-center text-grey">р а б о т ы</div>
             <q-item-label v-if="!servicesByCategory">Нет сервисов</q-item-label>
             <q-item v-for="service in servicesByCategory"
                     :key="service"
