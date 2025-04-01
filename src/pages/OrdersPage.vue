@@ -79,11 +79,11 @@ onMounted(() => {
         <!-- Первый ряд (3 колонки) -->
         <q-item-section class="col-12">
           <div class="row no-wrap items-center">
-            <div class="col-3 text-left">
+            <div class="col-2 text-left">
               <q-item-label class="text-body1 q-pa-none q-ma-none" style="font-size: 16px; align-items: flex-start; margin-bottom: -7px">
                 {{ new Date(order.created_at).toLocaleDateString('ru-RU') }}
               </q-item-label>
-              <q-item-label class="q-ml-sm" style="white-space: nowrap; color: limegreen">
+              <q-item-label name="order-number" class="q-ml-sm" style="white-space: nowrap; color: white">
                 №: {{order.id}}
               </q-item-label>
             </div>
@@ -92,6 +92,25 @@ onMounted(() => {
                  {{ order.client_name }}
               </q-item-label>
             </div>
+
+            <div class="col-1">
+              <div>
+                <q-item-label v-if="order.status === `waiting`">
+                  <q-icon name="hourglass_empty" spin color="yellow" class="q-ml-sm" />
+                </q-item-label>
+
+
+                <q-item-label v-if="order.status === `done`">
+                  <q-icon name="done" color="green" class="q-ml-sm" />
+                </q-item-label>
+
+                <q-item-label v-if="order.status === `process`">
+                  <q-icon name="build" spin color="red" class="q-ml-sm" />
+                </q-item-label>
+
+              </div>
+            </div>
+
             <div class="col-1 text-right">
               <div v-if="order.paid"
                    class="q-ml-sm"
@@ -139,15 +158,22 @@ onMounted(() => {
 }
 
 .border-waiting {
-  border-left: 3px solid yellow;
+  border-right: 1px solid yellow;
+  border-left: 1px solid yellow;
+  box-shadow: inset 0 0 15px rgba(255, 255, 0, 0.2);
 }
 
 .border-done {
-  border-left: 3px solid green;
+  border-right: 1px solid green;
+  border-left: 1px solid green;
+  box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1);;
 }
 
 .border-process {
-  border-left: 3px solid red;
+  border-right: 1px solid red;
+  border-left: 1px solid red;
+  box-shadow: inset 0 0 15px rgba(255, 0, 0, 0.5);;
+
 }
 
 </style>

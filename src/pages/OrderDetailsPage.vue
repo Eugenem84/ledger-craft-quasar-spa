@@ -514,6 +514,15 @@ const deleteMaterialFromOrder = (index) => {
   materials.value.splice(index, 1)
 }
 
+const clearOrder = () => {
+  console.log("очищаем текущий ордер...")
+  client.value = null
+  model.value = null
+  services.value = []
+  materials.value = []
+  products.value = []
+}
+
 </script>
 
 <template>
@@ -528,13 +537,6 @@ const deleteMaterialFromOrder = (index) => {
            class="btn-flex"
     />
 
-    <div v-if="order">
-      <a style="color:grey; font-size:12px ">№</a>
-      <a style="color: yellow; font-size: 17px; padding-top: 5px; display: inline-block">
-        {{order.id}}
-      </a>
-    </div>
-
     <q-btn flat
            v-if="editMode"
            color="yellow"
@@ -543,6 +545,21 @@ const deleteMaterialFromOrder = (index) => {
            size="md"
            class="btn-flex"
     />
+
+    <q-btn v-if="editMode"
+           flat
+           size="md"
+           color="yellow"
+           label="очистить"
+           @click="clearOrder"
+    />
+
+    <div v-if="order && !isNewOrder">
+      <a style="color:grey; font-size:12px ">№</a>
+      <a style="color: yellow; font-size: 17px; padding-top: 5px; display: inline-block">
+        {{order.id}}
+      </a>
+    </div>
 
     <div>
 
