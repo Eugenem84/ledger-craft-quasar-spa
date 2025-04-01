@@ -868,6 +868,7 @@ const clearOrder = () => {
                     color="yellow"
                     text-color="yellow"
                     @update:model-value="getServicesByCategory"
+                    :model-value="serviceCategories.length ? serviceCategories[0].id : null"
           />
 
           <q-list bordered separator >
