@@ -36,8 +36,8 @@ const selectedProductCategory = ref(null)
 //const clientName = ref(null)
 const client = ref({
   id:null,
-  name: null,
-  phone: null
+  name: 'выберите клиента',
+  phone: ''
 })
 const clientId = ref(null)
 const modelId = ref(null)
@@ -636,7 +636,7 @@ const clearOrder = () => {
                 :options="filteredClients"
                 v-if="editMode"
                 option-value="id"
-                :option-label="client => `${client.name} ${client.phone}`"
+                :option-label="client => client ? `${client.name} ${client.phone}` : 'Выберите клиента'"
                 label="Клиент"
                 color="yellow"
                 use-input
@@ -644,8 +644,12 @@ const clearOrder = () => {
                 hide-selected
                 input-debounce="300"
                 behavior="menu"
+                emit-value
+                map-options
                 @filter="filterClients"
-      />
+                placeholder="Выберите клиента"
+      >
+      </q-select>
 
       <!-- Режим просмотра -->
       <q-field v-if="!editMode" label="Клиент" stack-label tabindex="-1" style="pointer-events: none">
