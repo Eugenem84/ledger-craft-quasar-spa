@@ -171,6 +171,8 @@ const getServiceCategories = async () => {
     console.log('специализация: ', specializationId)
     const response = await api.get(`/get_categories/${specializationId}`)
     serviceCategories.value = response.data
+    selectedServiceCategory.value = serviceCategories.value[0]
+    await getServicesByCategory(selectedServiceCategory.value.id)
     console.log('сервис категории: ', serviceCategories.value)
   } catch (err) {
     console.error('ошибка загрузки сервис категорий', err)
@@ -249,7 +251,13 @@ onMounted(() => {
   getClients()
   getModels()
   getServiceCategories()
+
+  //selectedServiceCategory.value = serviceCategories.value[0].id
+
   console.log('client: ', client.value)
+
+
+
 })
 
 const getClients = async () => {
@@ -357,6 +365,7 @@ const createOrder = async () => {
 
 const updateOrder = async () => {
   console.log('обновляем ордер на сервере')
+  console.log('cервисы для сохранения: ', services.value)
   try {
     const totalAmount = totalSumServices.value + totalSumMaterials.value + totalSumProducts.value
     console.log('client_id: ', client.value.id)
@@ -868,7 +877,6 @@ const clearOrder = () => {
                     color="yellow"
                     text-color="yellow"
                     @update:model-value="getServicesByCategory"
-                    :model-value="serviceCategories.length ? serviceCategories[0].id : null"
           />
 
           <q-list bordered separator >
