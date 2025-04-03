@@ -747,7 +747,6 @@ const clearOrder = () => {
                 hide-selected
                 input-debounce="300"
                 behavior="menu"
-                emit-value
                 map-options
                 @filter="filterClients"
                 placeholder="Выберите клиента"
