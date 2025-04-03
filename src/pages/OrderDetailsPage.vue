@@ -111,6 +111,12 @@ const getServices = async () => {
     console.log('services: ', services.value )
   }  catch (err) {
     console.error('ошибка загрузки сервисов', err)
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки сервисов: ',
+      position: "top",
+      timeout: "1000"
+    })
   }
 }
 
@@ -160,6 +166,12 @@ const getMaterialsByOrder = async () => {
     console.log('materials: ', materials.value)
     console.log('products: ', products.value)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки материалов',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка получения материалов: ', err)
   }
 }
@@ -171,10 +183,16 @@ const getServiceCategories = async () => {
     console.log('специализация: ', specializationId)
     const response = await api.get(`/get_categories/${specializationId}`)
     serviceCategories.value = response.data
-    selectedServiceCategory.value = serviceCategories.value[0]
-    await getServicesByCategory(selectedServiceCategory.value.id)
+    selectedServiceCategory.value = serviceCategories.value[0].id
+    await getServicesByCategory(selectedServiceCategory.value)
     console.log('сервис категории: ', serviceCategories.value)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки категорий сервисов',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка загрузки сервис категорий', err)
   }
 }
@@ -187,6 +205,12 @@ const getServicesByCategory = async (categoryId) => {
     servicesByCategory.value = response.data
     console.log('подгружены сервисы категории: ', servicesByCategory.value)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки сервисов',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка загрузке сервисов данной категории: ', categoryId , err )
   }
 }
@@ -208,6 +232,12 @@ const deleteOrder = async () => {
           })
         }
       } catch (err) {
+        $q.notify({
+          type: 'negative',
+          message: 'ошибка удаления ордера',
+          position: "top",
+          timeout: "1000"
+        })
         console.error("Ошибка удаления ордера", err);
       } finally {
         router.back()
@@ -251,13 +281,7 @@ onMounted(() => {
   getClients()
   getModels()
   getServiceCategories()
-
-  //selectedServiceCategory.value = serviceCategories.value[0].id
-
   console.log('client: ', client.value)
-
-
-
 })
 
 const getClients = async () => {
@@ -266,6 +290,12 @@ const getClients = async () => {
     clients.value = response.data
     console.log('clients: ', clients)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки клиентов',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка получения клиентов: ', err)
   }
 }
@@ -276,6 +306,12 @@ const getModels = async () => {
     models.value = response.data
     console.log('models: ', models)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки моделей',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка получения моделей: ', err)
   }
 }
@@ -286,6 +322,12 @@ const getProductCategories = async () => {
     productCategories.value = response.data
     console.log('productCategories: ', productCategories.value)
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки категорий товаров',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -297,6 +339,12 @@ const getProductsByCategory = async (selectedProductCategory) => {
     storeProducts.value = response.data
     console.log('products: ', products.value)
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки продуктов',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -356,9 +404,20 @@ const createOrder = async () => {
       }
     })
     console.log('response: ', response)
-    console.log('переход не реализован')
+    $q.notify({
+      type: 'positive',
+      message: 'ордер создан',
+      position: "top",
+      timeout: "1000"
+    })
     router.back()
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка создания ордера',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -385,15 +444,23 @@ const updateOrder = async () => {
     })
     console.log('данные для передачи: ', response)
     console.log('данные ордера обновлены')
+    $q.notify({
+      type: 'positive',
+      message: 'ордер обновлен',
+      position: "top",
+      timeout: "1000"
+    })
     router.back()
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка ошибка обновления ордера',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка обновления ордера', err)
   }
 }
-
-// const saveOrder = () => {
-//   editMode.value = false
-// }
 
 // Вычисляемая сумма материалов
 const totalSumServices = computed(() => {
@@ -446,15 +513,28 @@ const closeDialog = () => {
 
 const addNewService = async () => {
   try {
+    console.log('selected category_id: ', selectedServiceCategory.value)
     const response = await api.post('/add_service', {
       service: newService.value.name,
       price: newService.value.price,
       category_id: selectedServiceCategory.value
     })
     console.log('response: ', response)
+    $q.notify({
+      type: 'positive',
+      message: 'работа ' + newService.value.name + ' успешно создана',
+      position: "top",
+      timeout: "1000"
+    })
     await getServicesByCategory(selectedServiceCategory.value)
     closeDialog()
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка создании работы',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка создание нового сервиса:  ',err)
   }
 }
@@ -506,7 +586,6 @@ const addNewModel = async () => {
 
 const addProductFromStore = () => {
   console.log('selectedStoreProduct: ', selectedStoreProduct.value)
-  //products.value.push(selectedStoreProduct.value)
   const product = {
     product_id: selectedStoreProduct.value.id,
     name: selectedStoreProduct.value.name,
