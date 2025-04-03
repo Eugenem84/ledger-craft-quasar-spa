@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from "vue-router";
 import { api } from 'boot/axios.js'
 import {useSpecializationsStore} from "stores/specializations.js";
@@ -15,6 +15,13 @@ const orderStore = useOrderStore()
 const router = useRouter()
 const loading = ref(false)
 const orders = ref([])
+
+const filterDone = ref(false) // Стейт для фильтрации завершенных заказов
+
+// Фильтрация заказов с учетом состояния фильтра
+const filteredOrders = computed(() => {
+  return orders.value.filter(order => filterDone.value || order.status !== 'done')
+})
 
 const statusBorderClass = (status) => {
   return {
@@ -73,10 +80,29 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="text-center" style="color: gray; font-size: 80% ; background-color: #1c1c1c" >
+    <span>о р д е р ы</span>
+  </div>
+
+  <div class="row items-center no-wrap">
+    <q-checkbox
+      v-model="filterDone"
+      dense
+      size="sm"
+      color="black"
+      class="q-mr-xs"
+    />
+    <span class="text-body2 text-grey-8 cursor-pointer"
+          :class="{ 'text-green': filterDone }"
+          @click="filterDone = !filterDone">
+    показывать готовые
+  </span>
+  </div>
+
   <q-page class="q-pa-none" style="padding: 0">
     <q-list bordered separator>
-      <q-item-label v-if="orders.length === 0">Нет данных</q-item-label>
-      <q-item v-for="order in orders"
+      <q-item-label v-if="filteredOrders.length === 0">Нет данных</q-item-label>
+      <q-item v-for="order in filteredOrders"
               :key="order"
               clickable
               v-ripple
@@ -167,14 +193,10 @@ onMounted(() => {
 }
 
 .border-waiting {
-  border-right: 1px solid yellow;
-  border-left: 1px solid yellow;
   box-shadow: inset 0 0 15px rgba(255, 255, 0, 0.2);
 }
 
 .border-done {
-  border-right: 1px solid green;
-  border-left: 1px solid green;
   box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1);;
 }
 
