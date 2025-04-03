@@ -821,6 +821,8 @@ const clearOrder = () => {
         <q-tab-panel name="all" style="padding: 0">
           <div>
 
+            <div class="text-center text-grey">работы:</div>
+
             <q-list bordered separator >
 
               <q-item-label v-if="!services">Нет сервисов</q-item-label>
@@ -851,10 +853,17 @@ const clearOrder = () => {
               </q-item>
             </q-list>
 
-            <div class="text-grey text-left" v-show="totalSumServices > 0 && totalSumMaterials > 0" >
+
+
+            <div class="text-grey text-left" v-show="totalSumMaterials > 0 || totalSumProducts > 0" >
               всего по работе : {{totalSumServices}}р
             </div>
 
+
+
+            <div v-if="products.length > 0 || materials.length > 0" class="text-center text-grey">
+              материалы:
+            </div>
             <!-- отображение списка материалов -->
             <q-list bordered separator >
 
@@ -938,7 +947,7 @@ const clearOrder = () => {
               </q-item>
             </q-list>
 
-            <div class="text-grey text-left" v-show="totalSumMaterials > 0 && totalSumServices > 0">
+            <div class="text-grey text-left" v-show="totalSumMaterials > 0 || totalSumProducts > 0">
               всего по материалам: {{totalSumMaterials + totalSumProducts}}р
             </div>
 
