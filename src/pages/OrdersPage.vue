@@ -19,9 +19,21 @@ const orders = ref([])
 const filterDone = ref(false) // Стейт для фильтрации завершенных заказов
 
 // Фильтрация заказов с учетом состояния фильтра
+// const filteredOrders = computed(() => {
+//   return orders.value.filter(order => filterDone.value || order.status !== 'done')
+// })
+
 const filteredOrders = computed(() => {
-  return orders.value.filter(order => filterDone.value || order.status !== 'done')
+  return orders.value.filter(order =>
+    (filterDone.value || order.status !== 'done') || (order.paid === false)
+  )
 })
+
+// const filteredOrders = computed(() => {
+//   return orders.value.filter(order => !(order.status === 'done' && order.paid === false))
+// })
+
+
 
 const statusBorderClass = (status) => {
   return {
@@ -95,7 +107,7 @@ onMounted(() => {
     <span class="text-body2 text-grey-8 cursor-pointer"
           :class="{ 'text-green': filterDone }"
           @click="filterDone = !filterDone">
-    показывать готовые
+    показывать готовые и оплаченые
   </span>
   </div>
 
