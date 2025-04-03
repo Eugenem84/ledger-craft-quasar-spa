@@ -1219,11 +1219,6 @@ const clearOrder = () => {
 
 <style scoped>
 
-.selectService:hover {
-  background-color: yellow;
-  color: black
-}
-
 .row {
   background-color: black;
 }
