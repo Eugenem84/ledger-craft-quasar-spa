@@ -565,7 +565,19 @@ const addNewClient = async () => {
     showAddNewClientDialog.value = false
     getClients()
     client.value = response.data.client
+    $q.notify({
+      type: 'positive',
+      message: 'новый клиент "' + newClient.value.name + '" добавлен',
+      position: "top",
+      timeout: "1000"
+    })
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка добавления клиента',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка добавления клиента: ', err)
   }
 }
@@ -579,7 +591,19 @@ const addNewModel = async () => {
     showAddNewModelDialog.value = false
     getModels()
     model.value = response.data.model
+    $q.notify({
+      type: 'positive',
+      message: 'модель добавлена',
+      position: "top",
+      timeout: "1000"
+    })
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка добавления модели',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
