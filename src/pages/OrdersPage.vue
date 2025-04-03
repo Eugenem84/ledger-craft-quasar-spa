@@ -4,7 +4,10 @@ import { useRouter } from "vue-router";
 import { api } from 'boot/axios.js'
 import {useSpecializationsStore} from "stores/specializations.js";
 import {useOrderStore} from "stores/order.js";
+import {useQuasar} from "quasar";
 import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
+
+const $q = useQuasar()
 
 const deleteConfirmPage = ref(null)
 
@@ -50,6 +53,12 @@ const getOrders = async () => {
     orders.value = response.data
     console.log('ордеры: ', response.data)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки ордеров',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('Ошибка загрузки ордеров: ', err)
   } finally {
     loading.value = false

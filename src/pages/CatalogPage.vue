@@ -2,11 +2,14 @@
 import {onMounted, ref} from 'vue'
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
+import {useQuasar} from "quasar";
 import DeleteConfirmPage from "pages/DeleteConfirmPage.vue";
 import NewClientDialogPage from "pages/dialogs/NewClientDialogPage.vue";
 import NewServiceDialogPage from "pages/dialogs/NewServiceDialogPage.vue";
 import NewServiceCategoryDialogPage from "pages/dialogs/NewServiceCategoryDialogPage.vue";
 import EditServiceCategoryDialogPage from "pages/dialogs/EditServiceCategoryDialogPage.vue";
+
+const $q = useQuasar()
 
 const newClientDialog = ref(null)
 const newServiceDialog = ref(null)
@@ -61,6 +64,12 @@ const getClients = async () => {
     clients.value = response.data
     console.log('clients: ', clients.value)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки клиентов',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка получения клиентов: ', err)
   }
 }
@@ -74,6 +83,12 @@ const getServiceCategories = async () => {
     serviceCategories.value = response.data
     console.log('сервис категории: ', serviceCategories.value)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки категорий работ',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка загрузки сервис категорий', err)
   }
 }
@@ -86,6 +101,12 @@ const getServicesByCategory = async (categoryId) => {
     services.value = response.data
     console.log('подгружены сервисы категории: ', services.value)
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки работ',
+      position: "top",
+      timeout: "1000"
+    })
     console.error('ошибка загрузке сервисов данной категории: ', categoryId , err )
   }
 }
@@ -113,7 +134,19 @@ const editClient = async () => {
     await getClients()
     editClientMode.value = false
     showClientsDetails.value = false
+    $q.notify({
+      type: 'positive',
+      message: 'клиент изменен',
+      position: "top",
+      timeout: "1000"
+    })
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка редактирования клиента',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -132,7 +165,19 @@ const editService = async () => {
     await getServicesByCategory(selectedServiceCategory.value)
     editServiceMode.value = false
     showServiceDetails.value = false
+    $q.notify({
+      type: 'positive',
+      message: 'работа изменена',
+      position: "top",
+      timeout: "1000"
+    })
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка изменения сервиса',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -146,7 +191,19 @@ const deleteClient = async () => {
     await getClients()
     editClientMode.value = false
     showClientsDetails.value = false
+    $q.notify({
+      type: 'positive',
+      message: 'клиент удален',
+      position: "top",
+      timeout: "1000"
+    })
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка удаления клиента',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -160,7 +217,19 @@ const deleteService = async () => {
     await getServicesByCategory()
     editServiceMode.value = false
     showServiceDetails.value = false
+    $q.notify({
+      type: 'positive',
+      message: 'работа удалена',
+      position: "top",
+      timeout: "1000"
+    })
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка удаления работы',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }

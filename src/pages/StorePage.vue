@@ -2,8 +2,11 @@
 import {onMounted, ref} from "vue";
 import {api} from "boot/axios.js";
 import {useSpecializationsStore} from "stores/specializations.js";
+import {useQuasar} from "quasar";
 import ProductCategoryDialogPage from "pages/dialogs/ProductCategoryDialogPage.vue";
 import ProductDialogPage from "pages/dialogs/ProductDialogPage.vue";
+
+const $q = useQuasar()
 
 const specializationStore = useSpecializationsStore()
 const selectedSpecializationId = specializationStore.getSelectedSpecialization
@@ -30,6 +33,12 @@ const getProductCategories = async () => {
     const response = await api.get(`/get_product_categories/${selectedSpecializationId.id}`)
     productCategories.value = response.data
   } catch (err) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки категорий товаров',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
@@ -40,6 +49,12 @@ const getProductsByProductCategories = async () => {
     products.value = response.data
     console.log('products: ', products.value)
   } catch (err){
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка загрузки товаров',
+      position: "top",
+      timeout: "1000"
+    })
     console.error(err)
   }
 }
