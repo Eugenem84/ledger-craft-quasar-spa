@@ -85,7 +85,7 @@ const deleteCategory = async () => {
     `Вы уверены, что хотите удалить товар "${currentProduct.value.name}"?`,
     async () => {
       try {
-        await api.post(`/delete_product`, {
+        await api.post(`/delete_store_product`, {
           productId: currentProduct.value.id
         });
         emit('product-saved'); // Обновляем список
