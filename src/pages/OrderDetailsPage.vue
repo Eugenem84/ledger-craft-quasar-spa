@@ -11,6 +11,8 @@ const deleteConfirmPage = ref(null)
 import {useQuasar} from "quasar";
 //import {data} from "autoprefixer";
 
+const isLoading = ref(false)
+
 const $q = useQuasar()
 
 const router = useRouter()
@@ -635,6 +637,51 @@ const clearOrder = () => {
   products.value = []
 }
 
+const generateAndCopyLink = async () => {
+  isLoading.value = true
+
+  try {
+    // 1. Запрашиваем ссылку у сервера
+    const { data } = await api.post(`/order-report/${order.value.id}/share-link`)
+
+    // 2. Копируем в буфер обмена
+    await copyToClipboard(data.url)
+
+    // 3. Показываем уведомление
+    $q.notify({
+      type: 'positive',
+      message: 'ссылка скопирована в буфер обмена',
+      position: "top",
+      timeout: "1000"
+    })
+  } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: 'ошибка копирования ссылки',
+      position: "top",
+      timeout: "1000"
+    })
+    console.error('Ошибка:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const copyToClipboard = async (text) => {
+  try {
+    // Современный API
+    await navigator.clipboard.writeText(text)
+  } catch {
+    // Фолбэк для старых браузеров
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+  }
+}
+
 </script>
 
 <template>
@@ -656,6 +703,15 @@ const clearOrder = () => {
            @click="$router.back()"
            size="md"
            class="btn-flex"
+    />
+
+    <q-btn
+      color="black"
+      icon="link"
+      text-color="yellow"
+      @click="generateAndCopyLink"
+      :loading="loading"
+      class="btn-flex"
     />
 
     <q-btn v-if="editMode"
