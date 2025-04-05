@@ -50,7 +50,7 @@ const saveProduct = async () => {
   try {
     //console.log('currentCategoryId: ', currentCategory.value.id)
     if (editMode.value){
-      //console.log('редактирование продукта не реализовано')
+      console.log('редактирование продукта не реализовано')
       await api.post(`/edit_product`, {
         id: currentProduct.value.id,
         name: name.value,
@@ -76,7 +76,7 @@ const saveProduct = async () => {
   }
 }
 
-const deleteCategory = async () => {
+const deleteProduct = async () => {
   if (!currentProduct.value) return
 
   // Показываем диалог подтверждения
@@ -193,7 +193,7 @@ defineExpose({open})
         <q-btn label="Удалить"
                flat
                color="yellow"
-               @click="deleteCategory"
+               @click="deleteProduct"
                v-if="!editMode"
         />
 

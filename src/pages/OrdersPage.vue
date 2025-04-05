@@ -18,22 +18,11 @@ const orders = ref([])
 
 const filterDone = ref(false) // Стейт для фильтрации завершенных заказов
 
-// Фильтрация заказов с учетом состояния фильтра
-// const filteredOrders = computed(() => {
-//   return orders.value.filter(order => filterDone.value || order.status !== 'done')
-// })
-
 const filteredOrders = computed(() => {
   return orders.value.filter(order =>
     (filterDone.value || order.status !== 'done') || (order.paid === false)
   )
 })
-
-// const filteredOrders = computed(() => {
-//   return orders.value.filter(order => !(order.status === 'done' && order.paid === false))
-// })
-
-
 
 const statusBorderClass = (status) => {
   return {
