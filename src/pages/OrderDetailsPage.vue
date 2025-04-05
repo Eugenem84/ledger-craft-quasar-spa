@@ -399,7 +399,6 @@ const createOrder = async () => {
       paid: paid.value,
       userOrderNumber: '',
       status: orderStatus.value,
-      materials: ''
     }, {
       headers: {
         Authorization: `Bearer ${token}`
