@@ -750,6 +750,7 @@ const clearOrder = () => {
                 map-options
                 @filter="filterClients"
                 placeholder="Выберите клиента"
+                outlined
       >
       </q-select>
 
@@ -775,6 +776,7 @@ const clearOrder = () => {
       <q-select v-model="model"
                 :options="models"
                 v-if="editMode"
+                outlined
                 option-value="id"
                 option-label="name"
                 label="Модель"
@@ -986,6 +988,7 @@ const clearOrder = () => {
                     option-value="id"
                     emit-value
                     map-options
+                    outlined
                     label="категории работ"
                     placeholder="нет категорий"
                     label-color="grey"

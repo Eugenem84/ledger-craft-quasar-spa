@@ -104,6 +104,7 @@ const handleProductAdded = () => {
             label-color="grey"
             color="yellow"
             class="col-9"
+            outlined
             @update:model-value="getProductsByProductCategories"
   />
 
