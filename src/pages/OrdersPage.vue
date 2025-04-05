@@ -24,6 +24,26 @@ const filteredOrders = computed(() => {
   )
 })
 
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+
+  // Опции для дня и месяца словами
+  const options = { day: '2-digit', month: 'long' };
+  let formatted = date.toLocaleDateString('ru-RU', options);
+
+  if (date.getFullYear() !== now.getFullYear()) {
+    // Добавляем двухзначный год
+    const year = String(date.getFullYear()).slice(-2);
+    formatted += ` ${year}`;
+  }
+
+  return formatted;
+}
+
+
+
 const statusBorderClass = (status) => {
   return {
     'border-waiting': status ==='waiting',
@@ -114,17 +134,18 @@ onMounted(() => {
       >
         <!-- Первый ряд (3 колонки) -->
         <q-item-section class="col-12">
-          <div class="row no-wrap items-center">
-            <div class="col-2 text-left">
-              <q-item-label class="text-body1 q-pa-none q-ma-none" style="font-size: 16px; align-items: flex-start; margin-bottom: -7px">
-                {{ new Date(order.created_at).toLocaleDateString('ru-RU') }}
+          <div class="row no-wrap items-center q-pa-none">
+            <div class="col-2 text-left q-pa-none">
+              <q-item-label style="white-space: nowrap;">
+                {{ formatDate(order.created_at) }}
               </q-item-label>
+
               <q-item-label name="order-number" class="q-ml-sm" style="white-space: nowrap; color: white">
                 №: {{order.id}}
               </q-item-label>
             </div>
             <div class="col-6 text-center">
-              <q-item-label>
+              <q-item-label style="white-space: normal; word-break: break-word">
                  {{ order.client_name }}
               </q-item-label>
             </div>
