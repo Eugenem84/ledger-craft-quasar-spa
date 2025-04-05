@@ -755,7 +755,13 @@ const clearOrder = () => {
       </q-select>
 
       <!-- Режим просмотра -->
-      <q-field v-if="!editMode" label="Клиент" stack-label tabindex="-1" style="pointer-events: none">
+      <q-field v-if="!editMode"
+               label="Клиент"
+               stack-label
+               tabindex="-1"
+               style="pointer-events: auto"
+               label-color="grey"
+      >
         <div class="column">
           <div class="text-subtitle1 text-yellow">{{ client?.name }}</div>
           <a v-if="client?.phone" :href="'tel:' + client.phone" class="text-yellow text-bold text-body2">
