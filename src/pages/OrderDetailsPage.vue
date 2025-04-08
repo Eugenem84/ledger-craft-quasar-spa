@@ -720,16 +720,16 @@ const copyToClipboard = async (text) => {
     <q-btn flat
            v-if="!editMode"
            color="yellow"
-           label="НАЗАД"
            @click="$router.back()"
            size="md"
            class="btn-flex"
+           icon="arrow_back"
     />
 
     <q-btn flat
            v-if="editMode"
            color="yellow"
-           label="отмена"
+           icon="undo"
            @click="$router.back()"
            size="md"
            class="btn-flex"
@@ -748,7 +748,7 @@ const copyToClipboard = async (text) => {
            flat
            size="md"
            color="yellow"
-           label="очистить"
+           icon="replay"
            @click="clearOrder"
     />
 
@@ -774,14 +774,14 @@ const copyToClipboard = async (text) => {
              v-if="!editMode"
              size="md"
              color="yellow"
-             label="РЕД"
+             icon="edit"
              @click="activeEditMode"
       />
       <q-btn flat
              v-if="editMode"
              size="md"
              color="yellow"
-             label="сохр"
+             icon="save"
              @click="saveOrder"
       />
 
