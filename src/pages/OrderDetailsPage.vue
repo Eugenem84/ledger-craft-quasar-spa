@@ -382,10 +382,31 @@ const saveOrder = async () => {
 
 const createOrder = async () => {
   const token = localStorage.getItem('authToken')
-  console.log('token: ', token)
-  console.log('сохроняем новый ордер')
-  console.log('services', services.value.map(service => service.id))
-  console.log('addedMaterials: ', materials.value)
+  //console.log('token: ', token)
+  //console.log('сохроняем новый ордер')
+  console.log('services: ', services.value)
+  //console.log('addedMaterials: ', materials.value)
+  //console.log('addedProducts: ', products.value)
+
+  // console.log('📤 Отправляем данные:', {
+  //   clientId: client.value.id,
+  //   modelId: model.value.id,
+  //   specializationId: selectedSpecializationId,
+  //   totalAmount: totalSumProducts.value + totalSumMaterials.value + totalSumServices.value,
+  //   addedMaterials: materials.value,
+  //   addedProducts: products.value,
+  //   services: services.value.map(service => ({
+  //     id: service.id,
+  //     price: service.price,
+  //     quantity: service.quantity || 1
+  //   })),
+  //   comments: comments.value,
+  //   paid: paid.value,
+  //   userOrderNumber: '',
+  //   status: orderStatus.value,
+  //   materials: '',
+  // })
+
   try {
     const response = await api.post(`/save_order`, {
       clientId: client.value.id,
@@ -394,7 +415,11 @@ const createOrder = async () => {
       totalAmount: totalSumProducts.value + totalSumMaterials.value + totalSumServices.value,
       addedMaterials: materials.value,
       addedProducts: products.value,
-      servicesId: services.value.map(service => service.id),
+      services: services.value.map(service => ({
+        id: service.id,
+        price: service.price,
+        quantity: service.quantity || 1
+      })),
       comments: comments.value,
       paid: paid.value,
       userOrderNumber: '',
@@ -429,8 +454,9 @@ const updateOrder = async () => {
   console.log('cервисы для сохранения: ', services.value)
   try {
     const totalAmount = totalSumServices.value + totalSumMaterials.value + totalSumProducts.value
-    console.log('client_id: ', client.value.id)
-    console.log('model_id', model.value.id)
+    //console.log('client_id: ', client.value.id)
+    //console.log('model_id', model.value.id)
+    console.log('services:', services.value)
     const response = await api.post('/update_order', {
       id: order.value.id,
       client_id: client.value.id,
@@ -441,7 +467,11 @@ const updateOrder = async () => {
       materials: materials.value,
       products: products.value,
       comments: comments.value,
-      services: services.value.map(service => service.id),
+      services: services.value.map(service => ({
+        id: service.id,
+        price: service.price,
+        quantity: service.quantity || 1,
+      })),
       paid: paid.value
     })
     console.log('данные для передачи: ', response)
@@ -903,10 +933,16 @@ const copyToClipboard = async (text) => {
                 </q-item-section>
 
 
-                <q-item-section >
-                      <q-item-label class="text-right">
-                        {{ service.price }}р
-                      </q-item-label>
+                <q-item-section side class="q-pl-none q-pr-none" style=" height: 50px">
+                  <q-input
+                    v-model.number="service.price"
+                    side
+                    dense
+                    suffix="₽"
+                    color="yellow"
+                    input-class="text-right"
+                    style="max-width: 80px; text-align: right"
+                  />
                 </q-item-section>
 
 
