@@ -108,7 +108,6 @@ onMounted(() => {
   <div class="row items-center no-wrap">
     <q-checkbox
       v-model="filterDone"
-      dense
       size="sm"
       color="black"
       class="q-mr-xs"

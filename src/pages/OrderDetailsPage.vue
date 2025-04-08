@@ -935,6 +935,7 @@ const copyToClipboard = async (text) => {
 
                 <q-item-section side class="q-pl-none q-pr-none" style=" height: 50px">
                   <q-input
+                    v-if="editMode"
                     v-model.number="service.price"
                     side
                     dense
@@ -943,6 +944,13 @@ const copyToClipboard = async (text) => {
                     input-class="text-right"
                     style="max-width: 80px; text-align: right"
                   />
+                  <div
+                    v-if="!editMode"
+                    class="q-pa-none text-right"
+                    style="max-width: 80px; text-align: right; color: white; cursor: pointer;"
+                  >
+                    {{ service.price }} ₽
+                  </div>
                 </q-item-section>
 
 
