@@ -6,8 +6,12 @@
               option-value="value"
               option-label="label"
               label="Выберите период"
+              label-color="grey"
               filled
               emit-value
+              color="yellow"
+              outlined
+              map-options
     />
 
   </div>
