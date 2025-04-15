@@ -34,11 +34,14 @@ const open = (product, productCategory) => {
   name.value = product?.name || ''
   baseSalePrice.value = product?.base_sale_price || ''
   storeBalance.value = product?.quantity || ''
-  if (currentProductCategory.value){
+  if (product){
+    console.log('product: ', product)
+    editMode.value = false
+    newProductMode.value = false
+  } else {
+    console.log('product:: ', product)
     editMode.value = true
     newProductMode.value = true
-  } else {
-    editMode.value = false
   }
   showDialog.value = true
   console.log('currentProductCategory:', currentProductCategory.value)
@@ -50,9 +53,9 @@ const open = (product, productCategory) => {
 
 const saveProduct = async () => {
   try {
-    //console.log('currentCategoryId: ', currentCategory.value.id)
-    if (editMode.value){
-      console.log('редактирование продукта не реализовано')
+    if (!currentProductCategory.value){
+      console.log('currenProduct: ', currentProduct.value.id)
+      console.log('редактирование продукта...')
       await api.post(`/edit_product`, {
         id: currentProduct.value.id,
         name: name.value,
