@@ -20,6 +20,7 @@ const showDialog = ref(false)
 
 const name = ref(null)
 const baseSalePrice = ref(null)
+const storeBalance = ref(null)
 
 const editMode = ref(false)
 const newProductMode = ref(false)
@@ -32,6 +33,7 @@ const open = (product, productCategory) => {
   currentProductCategory.value = productCategory || null
   name.value = product?.name || ''
   baseSalePrice.value = product?.base_sale_price || ''
+  storeBalance.value = product?.quantity || ''
   if (currentProductCategory.value){
     editMode.value = true
     newProductMode.value = true
@@ -55,6 +57,7 @@ const saveProduct = async () => {
         id: currentProduct.value.id,
         name: name.value,
         base_sale_price: baseSalePrice.value,
+        store_balance: storeBalance.value,
         specialization_id: specializationStore.getSelectedSpecialization.id
       })
       showDialog.value = false
@@ -154,6 +157,18 @@ defineExpose({open})
                    outlined
                    label="цена продажи"
                    placeholder="Введите цену продажи"
+                   class="q-mb-md"
+                   :disable="!editMode"
+          />
+        </div>
+      </q-card-section>
+
+      <q-card-section>
+        <div class="q-gutter-y-md">
+          <q-input v-model="storeBalance"
+                   outlined
+                   label="остаток на складе"
+                   placeholder="остаток"
                    class="q-mb-md"
                    :disable="!editMode"
           />

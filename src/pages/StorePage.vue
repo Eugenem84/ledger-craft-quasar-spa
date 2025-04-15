@@ -135,7 +135,6 @@ const handleProductAdded = () => {
       </q-item-label>
     </q-item-section>
 
-
     <q-item-section class="col-1">
       <q-item-label class="text-center">
         {{ product.quantity }}
