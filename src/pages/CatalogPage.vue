@@ -39,7 +39,6 @@ const showServiceDetails = ref(false)
 onMounted(() => {
   getClients()
   getServiceCategories()
-  getServicesByCategory()
 })
 
 function handleDelete(){
@@ -82,6 +81,8 @@ const getServiceCategories = async () => {
     const response = await api.get(`/get_categories/${specializationId}`)
     serviceCategories.value = response.data
     console.log('сервис категории: ', serviceCategories.value)
+    selectedServiceCategory.value = serviceCategories.value[0]
+    getServicesByCategory()
   } catch (err) {
     $q.notify({
       type: 'negative',

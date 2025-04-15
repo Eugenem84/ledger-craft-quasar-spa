@@ -23,8 +23,8 @@ const selectedProduct = ref(null)
 const productDialog = ref(null)
 const productCategoryDialog = ref(null)
 
-onMounted(() => {
-  getProductCategories()
+onMounted( async () => {
+  await getProductCategories()
 })
 
 const getProductCategories = async () => {
@@ -32,6 +32,8 @@ const getProductCategories = async () => {
   try {
     const response = await api.get(`/get_product_categories/${selectedSpecializationId.id}`)
     productCategories.value = response.data
+    selectedProductCategory.value = productCategories.value[0]
+    getProductsByProductCategories()
   } catch (err) {
     $q.notify({
       type: 'negative',

@@ -64,7 +64,7 @@ const saveProduct = async () => {
         specialization_id: specializationStore.getSelectedSpecialization.id
       })
       showDialog.value = false
-      emit('product-saved')
+      emit('product-added')
     } else {
       console.log('создаем новый продукт: ', currentProduct.value)
       await api.post(`/add_product`, {
