@@ -166,7 +166,7 @@ defineExpose({open})
         </div>
       </q-card-section>
 
-      <q-card-section>
+      <q-card-section v-if="!newProductMode">
         <div class="q-gutter-y-md">
           <q-input v-model="storeBalance"
                    outlined
