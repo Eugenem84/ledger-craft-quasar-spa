@@ -1,30 +1,40 @@
 <template>
   <div>
-    <q-select v-model="timePeriod"
-              @update:model-value="getIncomesByPeriod"
-              :options="periodOptions"
-              option-value="value"
-              option-label="label"
-              label="Выберите период"
-              label-color="grey"
-              filled
-              emit-value
-              color="yellow"
-              outlined
-              map-options
+    <q-select
+      v-model="timePeriod"
+      @update:model-value="getIncomesByPeriod"
+      :options="periodOptions"
+      option-value="value"
+      option-label="label"
+      label="Выберите период"
+      label-color="grey"
+      filled
+      emit-value
+      color="yellow"
+      outlined
+      map-options
     />
 
+<!--    <q-toggle-->
+<!--      v-model="showOrders"-->
+<!--      label="Показать кол‑во ордеров"-->
+<!--      color="yellow"-->
+<!--      class="q-mt-md"-->
+<!--    />-->
   </div>
-  <div style="height: 100%">
-    <Bar v-if="chartData && chartData.labels.length > 0"
-         :data="chartData"
-         :options="chartOptions"
-         style="height: 80vh"
+
+  <div style="height: 100%" class="q-mt-md">
+    <Bar
+      v-if="chartData && chartData.labels.length"
+      :data="chartData"
+      :options="chartOptions"
+      style="height: 80vh"
     />
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted, watch } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -35,66 +45,96 @@ import {
   CategoryScale,
   LinearScale
 } from 'chart.js'
-import {api} from "boot/axios.js";
-import {onMounted, ref} from "vue";
-import {useSpecializationsStore} from "stores/specializations.js";
+import { api } from 'boot/axios.js'
+import { useSpecializationsStore } from 'stores/specializations.js'
+
+// Регистрируем Chart.js
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const specializationsStore = useSpecializationsStore()
 const specializationId = specializationsStore.getSelectedSpecialization.id
+
 const timePeriod = ref('day')
 const periodOptions = [
-  {label: 'по месяцам', value: 'month'},
-  {label: 'по неделям', value: 'week'},
-  {label: 'по дням', value: 'day'},
-  {label: 'по годам', value: 'year'}
+  { label: 'по месяцам', value: 'month' },
+  { label: 'по неделям',  value: 'week'  },
+  { label: 'по дням',     value: 'day'   },
+  { label: 'по годам',    value: 'year'  }
 ]
-// Регистрируем нужные модули Chart.js
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
-// Пример данных (замени своими)
-const chartData = ref(null)
-
-const getIncomesByPeriod = async () => {
-  console.log("выбрана опция: ", timePeriod.value)
-  try {
-    const response = await api.post(`/incomes_by_period/${specializationId}`, {
-      period: timePeriod.value
-    })
-    const apiData = response.data
-
-    chartData.value = {
-      labels: apiData.map(entry => entry.period),
-      datasets: [
-        {
-          label: 'Доход (₽)',
-          backgroundColor: 'yellow',
-          data: apiData.map(entry => entry.total)
-        }
-      ]
-    }
-
-  } catch (err){
-    console.error('ошибка при загрузке данных: ', err)
-  }
-}
+const showOrders = ref(true)
+const chartData  = ref(null)
 
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   scales: {
-    y: {
-      beginAtZero: true
+    // левая ось — доход
+    'y-income': {
+      type: 'linear',
+      position: 'left',
+      beginAtZero: true,
+      title: { display: true, text: 'Доход, ₽' }
+    },
+    // правая ось — заказы
+    'y-orders': {
+      type: 'linear',
+      position: 'right',
+      beginAtZero: true,
+      grid: { drawOnChartArea: false },
+      ticks: {
+        stepSize: 1,
+        precision: 0
+      },
+      title: { display: true, text: 'Кол‑во ордеров' }
+    },
+    x: {
+      title: { display: true, text: 'Период' }
     }
+  },
+  plugins: {
+    legend: { position: 'bottom' }
   }
 }
 
-onMounted(() => {
-  getIncomesByPeriod()
-})
+async function getIncomesByPeriod() {
+  try {
+    const {data: apiData} = await api.post(
+      `/incomes_by_period/${specializationId}`,
+      {period: timePeriod.value}
+    )
 
+    const labels = apiData.map(e => e.period)
+    const datasets = [
+      {
+        label: 'Доход (₽)',
+        type: 'bar',
+        yAxisID: 'y-income',
+        backgroundColor: 'yellow',
+        data: apiData.map(e => e.total)
+      }
+    ]
 
+    if (showOrders.value) {
+      datasets.push({
+        label: 'Кол‑во ордеров',
+        type: 'bar',
+        yAxisID: 'y-orders',
+        backgroundColor: 'grey',
+        data: apiData.map(e => e.count)
+      })
+    }
+
+    chartData.value = {labels, datasets}
+  } catch (err) {
+    console.error('ошибка при загрузке данных:', err)
+  }
+}
+
+watch([timePeriod, showOrders], getIncomesByPeriod)
+onMounted(getIncomesByPeriod)
 </script>
 
 <style scoped>
-
+/* дополнительные стили по желанию */
 </style>
