@@ -100,7 +100,7 @@ const filterClients = (val, update) => {
   update(() => {
     filteredClients.value = clients.value.filter(client =>
       client.name.toLowerCase().includes(val.toLowerCase()) ||
-      client.phone.toString().toLowerCase().includes(val.toLowerCase())
+      (client.phone || '').toString().toLowerCase().includes(val.toLowerCase())
     )
   })
 }

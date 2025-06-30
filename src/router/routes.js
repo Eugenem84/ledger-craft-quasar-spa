@@ -1,3 +1,5 @@
+//import {meta} from "@eslint/js";
+
 const routes = [
   {
     path: '/',
@@ -9,7 +11,8 @@ const routes = [
       { path: 'analytic', component: () => import('pages/AnalyticPage.vue'), meta: { requiresAuth: true }},
       { path: 'other', component: () => import('pages/OtherPage.vue'), meta: { requiresAuth: true }},
       { path: 'catalog', component: () => import('pages/CatalogPage.vue'), meta: { requiresAuth: true }},
-      { path: 'login', component: () => import('pages/auth/LoginPage.vue'), meta: { hideFooter: true }}
+      { path: 'login', component: () => import('pages/auth/LoginPage.vue'), meta: { hideFooter: true }},
+      { path: 'register', component: () => import('pages/auth/RegisterPage.vue'), meta: { hideFooter: true }}
     ]
   },
   {
